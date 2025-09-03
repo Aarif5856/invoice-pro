@@ -313,19 +313,6 @@ export default function Auth({ onAuthChange, isLoggingOut } = {}) {
             {isLogin ? 'Sign In' : 'Create Account'}
           </button>
 
-          {/* Skip login button for local development */}
-          <button 
-            onClick={() => {
-              console.log('Skip login clicked');
-              setUser({ uid: 'local-user', email: 'local@example.com' });
-              if (typeof onAuthChange === 'function') onAuthChange(true);
-            }} 
-            className="auth-submit-btn" 
-            style={{ backgroundColor: '#6b7280', marginTop: '10px' }}
-          >
-            Skip Login (Local Development)
-          </button>
-
           {!isLogin && (
             <div className="terms-text">
               By creating an account you agree to freeinvoicebuilder.com{' '}
