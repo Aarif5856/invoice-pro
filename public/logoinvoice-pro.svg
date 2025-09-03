@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="200" viewBox="0 0 600 200">
+  <defs>
+    <linearGradient id="g" x1="0" x2="1">
+      <stop offset="0" stop-color="#3aa0ff"/>
+      <stop offset="1" stop-color="#0066ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="600" height="200" fill="white"/>
+  <!-- document icon -->
+  <g transform="translate(20,20)">
+    <rect x="0" y="0" width="120" height="160" rx="10" fill="url(#g)" />
+    <polyline points="120,0 98,0 120,22" fill="#fff" opacity="0.9" />
+    <path d="M16 32h88v8H16zM16 52h88v8H16zM16 72h88v8H16z" fill="rgba(255,255,255,0.95)" />
+    <polyline points="80,140 104,116 104,140" fill="#fff" opacity="0.85" />
+  </g>
+  <!-- brand text -->
+  <g transform="translate(160,80)">
+    <text x="0" y="0" font-family="Arial, Helvetica, sans-serif" font-size="48" fill="#111">Invoice</text>
+    <text x="0" y="44" font-family="Arial, Helvetica, sans-serif" font-size="48" fill="#0066ff">Pro</text>
+  </g>
+</svg>
