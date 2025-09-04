@@ -57,10 +57,30 @@ function App() {
   
   // Get subscription info for UI display
   const [subscriptionInfo, setSubscriptionInfo] = useState(() => SubscriptionService.getSubscriptionInfo());
+  const [showPlans, setShowPlans] = useState(false); // toggle plan selection UI
+  const [planMessage, setPlanMessage] = useState('');
   
   // Update subscription info when usage changes
   const updateSubscriptionInfo = () => {
     setSubscriptionInfo(SubscriptionService.getSubscriptionInfo());
+  };
+
+  const handleUpgrade = (plan) => {
+    try {
+      if (plan === subscriptionInfo.plan) return; // no change
+      // store chosen plan
+      const userDataRaw = localStorage.getItem('userData') || '{}';
+      const userData = JSON.parse(userDataRaw);
+      userData.plan = plan;
+      userData.planChangedAt = new Date().toISOString();
+      localStorage.setItem('userData', JSON.stringify(userData));
+      // refresh info
+      updateSubscriptionInfo();
+      setPlanMessage(`Plan updated to ${plan.toUpperCase()} successfully.`);
+      // If moving from free to paid, remove watermark flag by reloading banner state (handled by info)
+    } catch (e) {
+      setPlanMessage('Failed to update plan.');
+    }
   };
 
   // Validation functions delegated to ValidationService
@@ -411,17 +431,20 @@ function App() {
                   <div style={{ fontSize: '12px', opacity: 0.8 }}>Receipts</div>
                 </div>
                 
-                <button style={{
-                  background: '#fff',
-                  color: '#667eea',
-                  border: 'none',
-                  padding: '10px 20px',
-                  borderRadius: '8px',
-                  fontWeight: '600',
-                  cursor: 'pointer',
-                  fontSize: '14px'
-                }}>
-                  💎 Upgrade to Pro
+                <button
+                  onClick={() => setShowPlans(v => !v)}
+                  style={{
+                    background: '#fff',
+                    color: '#667eea',
+                    border: 'none',
+                    padding: '10px 20px',
+                    borderRadius: '8px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    fontSize: '14px'
+                  }}
+                >
+                  {subscriptionInfo.plan === 'free' ? '💎 Upgrade Plan' : '🛠 Manage Plan'}
                 </button>
               </div>
             </div>
@@ -439,6 +462,72 @@ function App() {
               </div>
             )}
           </div>
+
+          {showPlans && (
+            <div style={{
+              margin: '0 20px 25px 20px',
+              background: '#ffffff',
+              borderRadius: '18px',
+              padding: '28px 24px 32px',
+              boxShadow: '0 6px 28px rgba(0,0,0,0.08)',
+              border: '1px solid #eef2f7'
+            }}>
+              <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',flexWrap:'wrap',gap: '22px'}}>
+                {/* FREE PLAN CARD */}
+                <PlanCard
+                  title="Free"
+                  accent="#667eea"
+                  current={subscriptionInfo.plan === 'free'}
+                  priceText="$0"
+                  bulletPoints={[
+                    '3 Invoices / month',
+                    '3 Receipts / month',
+                    '1 Theme',
+                    'Watermark on PDFs'
+                  ]}
+                  actionLabel={subscriptionInfo.plan === 'free' ? 'Current Plan' : 'Switch'}
+                  disabled={subscriptionInfo.plan === 'free'}
+                  onSelect={() => handleUpgrade('free')}
+                />
+                {/* PRO PLAN CARD */}
+                <PlanCard
+                  title="Pro"
+                  accent="#00A884"
+                  highlight
+                  current={subscriptionInfo.plan === 'pro'}
+                  priceText="$9.99/mo"
+                  bulletPoints={[
+                    'Unlimited invoices & receipts',
+                    'All themes',
+                    'No watermark',
+                    'Priority support'
+                  ]}
+                  actionLabel={subscriptionInfo.plan === 'pro' ? 'Current Plan' : (subscriptionInfo.plan === 'free' ? 'Upgrade' : 'Switch')}
+                  disabled={subscriptionInfo.plan === 'pro'}
+                  onSelect={() => handleUpgrade('pro')}
+                />
+                {/* BUSINESS PLAN CARD */}
+                <PlanCard
+                  title="Business"
+                  accent="#8B5CF6"
+                  current={subscriptionInfo.plan === 'business'}
+                  priceText="$19.99/mo"
+                  bulletPoints={[
+                    'Everything in Pro',
+                    'Multi-user access',
+                    'API access',
+                    'Custom branding'
+                  ]}
+                  actionLabel={subscriptionInfo.plan === 'business' ? 'Current Plan' : 'Upgrade'}
+                  disabled={subscriptionInfo.plan === 'business'}
+                  onSelect={() => handleUpgrade('business')}
+                />
+              </div>
+              {planMessage && (
+                <div style={{marginTop:20,fontSize:14,fontWeight:500,color:'#1a1f29'}}>{planMessage}</div>
+              )}
+            </div>
+          )}
 
           <nav className="nav">
             <button className={`nav-btn${formType === 'invoice' ? ' active' : ''}`} onClick={() => setFormType('invoice')}>Create Invoice</button>
@@ -1234,3 +1323,53 @@ function App() {
 }
 
 export default App;
+
+/* ========= Plan Card Component (inline for brevity) ========= */
+function PlanCard({ title, accent, priceText, bulletPoints, actionLabel, onSelect, disabled, current, highlight }) {
+  return (
+    <div style={{
+      flex: '1 1 260px',
+      background: '#fff',
+      borderRadius: '16px',
+      padding: '22px 20px 26px',
+      position: 'relative',
+      boxShadow: highlight ? '0 10px 30px -6px rgba(102,126,234,0.35)' : '0 4px 18px rgba(0,0,0,0.07)',
+      border: highlight ? `2px solid ${accent}` : '1px solid #e5e9f2',
+      transform: highlight ? 'translateY(-4px)' : 'none'
+    }}>
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+        <h4 style={{margin:0,fontSize:18,fontWeight:700,color:'#1f2735'}}>{title}</h4>
+        {current && <span style={{background:accent,color:'#fff',padding:'4px 10px',borderRadius:20,fontSize:11,fontWeight:600}}>CURRENT</span>}
+      </div>
+      <div style={{margin:'10px 0 14px',fontSize:26,fontWeight:700,color:accent}}>{priceText}</div>
+      <ul style={{listStyle:'none',padding:0,margin:0,display:'flex',flexDirection:'column',gap:8,fontSize:13}}>
+        {bulletPoints.map((pt,i)=>(
+          <li key={i} style={{display:'flex',alignItems:'center',gap:6,color:'#2d3a4d'}}>
+            <span style={{fontSize:14,color:accent}}>✔</span>
+            <span>{pt}</span>
+          </li>
+        ))}
+      </ul>
+      <button
+        disabled={disabled}
+        onClick={onSelect}
+        style={{
+          marginTop:18,
+          width:'100%',
+          background: disabled ? '#d3d8e2' : accent,
+          color:'#fff',
+          border:'none',
+          padding:'12px 14px',
+          borderRadius:10,
+          cursor: disabled ? 'not-allowed' : 'pointer',
+          fontWeight:600,
+          fontSize:14,
+          letterSpacing:'.3px'
+        }}
+      >{actionLabel}</button>
+    </div>
+  );
+}
+
+/* ========= Handlers appended after component declarations for clarity ========= */
+// We declare helper functions on prototype of App? Simpler: since this file is large, we attach them to window then call inside component? Instead, minimal approach: define below and hoist via function declarations? Not needed.
