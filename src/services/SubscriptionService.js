@@ -229,6 +229,5 @@ export class SubscriptionService {
   }
 }
 
-// Export both the class and an instance
-export { SubscriptionService };
+// Export class (already named via 'export class') and also as default
 export default SubscriptionService;
