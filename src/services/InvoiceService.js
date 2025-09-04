@@ -3,6 +3,7 @@ import ValidationService from './ValidationService.js';
 import StorageService from './StorageService.js';
 import CurrencyService from './CurrencyService.js';
 import FirebaseService from './FirebaseService.js';
+import { SubscriptionService } from './SubscriptionService.js';
 
 export class InvoiceService {
   constructor() {
@@ -11,11 +12,17 @@ export class InvoiceService {
     this.storageService = StorageService;
     this.currencyService = CurrencyService;
     this.firebaseService = FirebaseService;
+    this.subscriptionService = SubscriptionService;
   }
 
   // Generate professional invoice PDF
   async generateInvoicePDF(invoiceData, theme = 'minimalist', isDraft = false) {
     try {
+      // Check subscription limits FIRST
+      const canGenerate = this.subscriptionService.canGenerateDocument('invoice');
+      if (!canGenerate.allowed) {
+        throw new Error(canGenerate.reason || 'Monthly invoice limit reached. Upgrade to Pro for unlimited invoices.');
+      }
       // Validate invoice data
       const errors = this.validationService.validateInvoice(invoiceData);
       if (Object.keys(errors).length > 0) {
@@ -35,11 +42,22 @@ export class InvoiceService {
       const timestamp = Date.now();
       const filename = `invoice_${invoiceData.invoiceNumber || timestamp}.pdf`;
 
-      // Download PDF
-      doc.save(filename);
+      // Download PDF using blob method (mobile compatible)
+      const pdfBlob = doc.output('blob');
+      const url = URL.createObjectURL(pdfBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
 
       // Add to history
       this.storageService.addToHistory(invoiceData, 'invoice', filename);
+
+      // Increment usage counter after successful generation
+      this.subscriptionService.incrementUsage('invoice');
 
       // Try to save to Firebase (optional)
       try {
@@ -58,6 +76,11 @@ export class InvoiceService {
   // Generate professional receipt PDF
   async generateReceiptPDF(receiptData, theme = 'minimalist', isDraft = false) {
     try {
+      // Check subscription limits FIRST
+      const canGenerate = this.subscriptionService.canGenerateDocument('receipt');
+      if (!canGenerate.allowed) {
+        throw new Error(canGenerate.reason || 'Monthly receipt limit reached. Upgrade to Pro for unlimited receipts.');
+      }
       // Validate receipt data
       const errors = this.validationService.validateReceipt(receiptData);
       if (Object.keys(errors).length > 0) {
@@ -77,11 +100,22 @@ export class InvoiceService {
       const timestamp = Date.now();
       const filename = `receipt_${receiptData.receiptNumber || timestamp}.pdf`;
 
-      // Download PDF
-      doc.save(filename);
+      // Download PDF using blob method (mobile compatible)
+      const pdfBlob = doc.output('blob');
+      const url = URL.createObjectURL(pdfBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
 
       // Add to history
       this.storageService.addToHistory(receiptData, 'receipt', filename);
+
+      // Increment usage counter after successful generation
+      this.subscriptionService.incrementUsage('receipt');
 
       // Try to save to Firebase (optional)
       try {
