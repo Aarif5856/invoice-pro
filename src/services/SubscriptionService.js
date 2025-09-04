@@ -123,7 +123,7 @@ export class SubscriptionService {
     }
     
     localStorage.setItem('userUsage', JSON.stringify(usage));
-    return usage;
+  return this.getSubscriptionInfo();
   }
 
   // Check if user can use specific theme
@@ -226,6 +226,59 @@ export class SubscriptionService {
     }
     
     return null;
+  }
+
+  /* =====================
+     NEW API (for UI & services)
+     ===================== */
+
+  // Unified info object used by App.jsx
+  static getSubscriptionInfo() {
+    const plan = this.getCurrentPlan();
+    const usage = this.getCurrentUsage();
+    const limits = this.PLAN_LIMITS[plan];
+    const invoiceLimit = limits.invoicesPerMonth;
+    const receiptLimit = limits.receiptsPerMonth;
+
+    const toNumber = (v) => (v === -1 ? Infinity : v);
+
+    return {
+      plan,
+      usage: {
+        invoice: usage.invoicesCreated || 0,
+        receipt: usage.receiptsCreated || 0
+      },
+      limits: {
+        invoice: toNumber(invoiceLimit),
+        receipt: toNumber(receiptLimit),
+        totalDocuments: (invoiceLimit === -1 || receiptLimit === -1)
+          ? Infinity
+          : (invoiceLimit + receiptLimit)
+      },
+      features: this.getPlanFeatures(plan)
+    };
+  }
+
+  // Check generation permission with detailed response expected by InvoiceService
+  static canGenerateDocument(type = 'invoice') {
+    const plan = this.getCurrentPlan();
+    const usage = this.getCurrentUsage();
+    const limits = this.PLAN_LIMITS[plan];
+    const isInvoice = type === 'invoice';
+    const limit = isInvoice ? limits.invoicesPerMonth : limits.receiptsPerMonth;
+    const used = isInvoice ? usage.invoicesCreated : usage.receiptsCreated;
+
+    if (limit === -1) {
+      return { allowed: true, remaining: Infinity };
+    }
+    if (used < limit) {
+      return { allowed: true, remaining: limit - used };
+    }
+    return {
+      allowed: false,
+      remaining: 0,
+      reason: `Monthly ${type} limit reached (${limit}). Upgrade to Pro for unlimited ${type === 'invoice' ? 'invoices' : 'receipts'}.`
+    };
   }
 }
 
