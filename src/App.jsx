@@ -6,7 +6,8 @@ import {
   ValidationService, 
   StorageService, 
   CurrencyService,
-  FirebaseService 
+  FirebaseService,
+  AnalyticsService
 } from './services';
 import { SubscriptionService } from './services/SubscriptionService';
 
@@ -77,6 +78,7 @@ function App() {
       // refresh info
       updateSubscriptionInfo();
       setPlanMessage(`Plan updated to ${plan.toUpperCase()} successfully.`);
+  AnalyticsService.planUpgradeSuccess(plan, subscriptionInfo.plan);
       // If moving from free to paid, remove watermark flag by reloading banner state (handled by info)
     } catch (e) {
       setPlanMessage('Failed to update plan.');
@@ -275,10 +277,12 @@ function App() {
   const subtotal = items => InvoiceService.calculateInvoiceTotals(items, 0, 0).subtotal;
 
   const generateAndUploadInvoice = async () => {
+    AnalyticsService.docGenerationStart('invoice');
     setUploading(true);
     try {
       const result = await InvoiceService.generateInvoicePDF(invoice, selectedTheme, isDraftMode);
       setUploadMessage('✅ Professional invoice generated and downloaded successfully!');
+      AnalyticsService.docGenerationSuccess('invoice', subscriptionInfo.plan);
       
       // Update state with latest data
       setSavedDrafts(StorageService.getDrafts());
@@ -293,14 +297,17 @@ function App() {
         setValidationErrors(errors);
         setShowValidation(true);
         setUploadMessage('❌ Please fix the validation errors before generating PDF');
+        AnalyticsService.docGenerationError('invoice', 'validation');
         
         // Scroll to first error
         ValidationService.scrollToFirstError(errors);
       } else if (error.message.includes('limit reached')) {
         setUploadMessage('❌ ' + error.message);
+        AnalyticsService.limitHit('invoice', subscriptionInfo.plan);
       } else {
         console.error('Invoice generation failed:', error);
         setUploadMessage('❌ Failed to generate invoice. Please try again.');
+        AnalyticsService.docGenerationError('invoice', 'other');
       }
     } finally {
       setUploading(false);
@@ -309,10 +316,12 @@ function App() {
   };
 
   const generateAndUploadReceipt = async () => {
+    AnalyticsService.docGenerationStart('receipt');
     setUploading(true);
     try {
       const result = await InvoiceService.generateReceiptPDF(receipt, selectedTheme, isDraftMode);
       setUploadMessage('✅ Professional receipt generated and downloaded successfully!');
+      AnalyticsService.docGenerationSuccess('receipt', subscriptionInfo.plan);
       
       // Update state with latest data
       setSavedDrafts(StorageService.getDrafts());
@@ -327,14 +336,17 @@ function App() {
         setValidationErrors(errors);
         setShowValidation(true);
         setUploadMessage('❌ Please fix the validation errors before generating PDF');
+        AnalyticsService.docGenerationError('receipt', 'validation');
         
         // Scroll to first error
         ValidationService.scrollToFirstError(errors);
       } else if (error.message.includes('limit reached')) {
         setUploadMessage('❌ ' + error.message);
+        AnalyticsService.limitHit('receipt', subscriptionInfo.plan);
       } else {
         console.error('Receipt generation failed:', error);
         setUploadMessage('❌ Failed to generate receipt. Please try again.');
+        AnalyticsService.docGenerationError('receipt', 'other');
       }
     } finally {
       setUploading(false);
@@ -432,7 +444,7 @@ function App() {
                 </div>
                 
                 <button
-                  onClick={() => setShowPlans(v => !v)}
+                  onClick={() => { AnalyticsService.planUpgradeClick('view_plans', subscriptionInfo.plan); setShowPlans(v => !v); }}
                   style={{
                     background: '#fff',
                     color: '#667eea',
@@ -487,7 +499,7 @@ function App() {
                   ]}
                   actionLabel={subscriptionInfo.plan === 'free' ? 'Current Plan' : 'Switch'}
                   disabled={subscriptionInfo.plan === 'free'}
-                  onSelect={() => handleUpgrade('free')}
+                  onSelect={() => { AnalyticsService.planUpgradeClick('free', subscriptionInfo.plan); handleUpgrade('free'); }}
                 />
                 {/* PRO PLAN CARD */}
                 <PlanCard
@@ -504,7 +516,7 @@ function App() {
                   ]}
                   actionLabel={subscriptionInfo.plan === 'pro' ? 'Current Plan' : (subscriptionInfo.plan === 'free' ? 'Upgrade' : 'Switch')}
                   disabled={subscriptionInfo.plan === 'pro'}
-                  onSelect={() => handleUpgrade('pro')}
+                  onSelect={() => { AnalyticsService.planUpgradeClick('pro', subscriptionInfo.plan); handleUpgrade('pro'); }}
                 />
                 {/* BUSINESS PLAN CARD */}
                 <PlanCard
@@ -520,7 +532,7 @@ function App() {
                   ]}
                   actionLabel={subscriptionInfo.plan === 'business' ? 'Current Plan' : 'Upgrade'}
                   disabled={subscriptionInfo.plan === 'business'}
-                  onSelect={() => handleUpgrade('business')}
+                  onSelect={() => { AnalyticsService.planUpgradeClick('business', subscriptionInfo.plan); handleUpgrade('business'); }}
                 />
               </div>
               {planMessage && (
@@ -1002,7 +1014,7 @@ function App() {
                       type="button"
                       className="export-btn"
                       tabIndex={0}
-                      disabled={uploading}
+                      disabled={uploading || (subscriptionInfo.plan === 'free' && subscriptionInfo.usage.invoice >= subscriptionInfo.limits.invoice)}
                       onClick={generateAndUploadInvoice}
                       onKeyDown={e => {
                         if (e.key === 'Enter' || e.key === ' ') {
@@ -1185,7 +1197,7 @@ function App() {
                       type="button"
                       className="export-btn"
                       tabIndex={0}
-                      disabled={uploading}
+                      disabled={uploading || (subscriptionInfo.plan === 'free' && subscriptionInfo.usage.receipt >= subscriptionInfo.limits.receipt)}
                       onClick={generateAndUploadReceipt}
                       onKeyDown={e => {
                         if (e.key === 'Enter' || e.key === ' ') {
