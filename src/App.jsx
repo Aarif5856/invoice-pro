@@ -473,7 +473,23 @@ function App() {
                 </div>
                 
                 <button
-                  onClick={() => { AnalyticsService.planUpgradeClick('view_plans', subscriptionInfo.plan); setShowPlans(v => !v); }}
+                  onClick={() => { 
+                    AnalyticsService.planUpgradeClick('view_plans', subscriptionInfo.plan); 
+                    if (showPlans && selectedPlanForPayment) {
+                      // If plans are shown and a plan is selected, reset and hide
+                      setSelectedPlanForPayment(null);
+                      setShowPlans(false);
+                      setPlanMessage('');
+                    } else {
+                      // Show plans
+                      setShowPlans(true);
+                      // If user is on free plan, auto-focus on Pro plan for payment
+                      if (subscriptionInfo.plan === 'free') {
+                        setSelectedPlanForPayment('pro');
+                        setPlanMessage('Select your preferred payment method for PRO plan:');
+                      }
+                    }
+                  }}
                   style={{
                     background: '#fff',
                     color: '#667eea',
