@@ -105,7 +105,7 @@ class PayoneerService {
         `Reference: ${referenceId}`,
         `Your email: ${customerEmail}`,
         `Plan: ${planKey.toUpperCase()}`,
-        `After payment, email confirmation to: ${this.localBankDetails.email}`
+        `After payment, email confirmation to: ${this.qatarBankDetails.email}`
       ],
       fees: 'Small Payoneer fee applies',
       activationTime: 'Instant after confirmation'
@@ -126,15 +126,15 @@ class PayoneerService {
       referenceId,
       amount: amountQAR,
       currency: 'QAR',
-      bankDetails: this.localBankDetails,
+      bankDetails: this.qatarBankDetails,
       instructions: [
         `Transfer QAR ${amountQAR.toLocaleString()} to the account below:`,
-        `Bank: ${this.localBankDetails.bankName}`,
-        `Account Name: ${this.localBankDetails.accountName}`,
-        `Account Number: ${this.localBankDetails.accountNumber}`,
-        `IBAN: ${this.localBankDetails.iban}`,
+        `Bank: ${this.qatarBankDetails.bankName}`,
+        `Account Name: ${this.qatarBankDetails.accountName}`,
+        `Account Number: ${this.qatarBankDetails.accountNumber}`,
+        `IBAN: ${this.qatarBankDetails.iban}`,
         `Reference: ${referenceId}`,
-        `Send payment confirmation to: ${this.localBankDetails.email}`,
+        `Send payment confirmation to: ${this.qatarBankDetails.email}`,
         `Include your email (${customerEmail}) in transfer description`
       ],
       activationTime: '2-6 hours during business hours',
@@ -169,7 +169,7 @@ class PayoneerService {
         `Reference: ${referenceId} - ${customerEmail}`,
         `Final Credit to: ${this.payoneerDetails.email}`,
         `Purpose: Software Subscription - Invoice Pro ${planKey.toUpperCase()}`,
-        `Email wire confirmation to: ${this.localBankDetails.email}`
+        `Email wire confirmation to: ${this.qatarBankDetails.email}`
       ],
       fees: 'Bank charges may apply (typically $15-50 USD)',
       activationTime: '1-2 business days',
@@ -195,7 +195,7 @@ class PayoneerService {
       instructions: [
         `Send exactly $${plan.price} USD equivalent to any address above`,
         `Use Reference: ${referenceId}`,
-        `Send transaction hash/screenshot to: ${this.localBankDetails.email}`,
+        `Send transaction hash/screenshot to: ${this.qatarBankDetails.email}`,
         `Include your account email in the message`
       ],
       rates: 'Use current market rates (coinmarketcap.com)',
@@ -205,6 +205,12 @@ class PayoneerService {
 
   // Process payment based on method
   async processPayment(paymentMethod, planData, userInfo) {
+    console.log('PayoneerService.processPayment called with:', {
+      paymentMethod,
+      planData,
+      userInfo
+    });
+    
     try {
       switch (paymentMethod.id) {
         case 'payoneer_direct':
@@ -220,17 +226,19 @@ class PayoneerService {
           return await this.processCryptoPayment(planData, userInfo);
         
         default:
-          throw new Error('Payment method not supported');
+          throw new Error(`Payment method not supported: ${paymentMethod.id}`);
       }
     } catch (error) {
-      console.error('Payment processing error:', error);
+      console.error('Payment processing error in PayoneerService:', error);
       throw error;
     }
   }
 
   // Process Payoneer direct payment
   async processPayoneerDirectPayment(planData, userInfo) {
+    console.log('Processing Payoneer Direct Payment:', { planData, userInfo });
     const instructions = this.generatePayoneerDirectPaymentInstructions(planData.key, userInfo.email);
+    console.log('Generated instructions:', instructions);
     return {
       success: true,
       method: 'payoneer_direct',

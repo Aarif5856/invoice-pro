@@ -527,6 +527,7 @@ function App() {
                   onSelect={() => { AnalyticsService.planUpgradeClick('free', subscriptionInfo.plan); handleUpgrade('free'); }}
                   planKey="free"
                   showPayment={false}
+                  user={user}
                 />
                 {/* PRO PLAN CARD */}
                 <PlanCard
@@ -546,6 +547,7 @@ function App() {
                   onSelect={() => { AnalyticsService.planUpgradeClick('pro', subscriptionInfo.plan); handleUpgrade('pro'); }}
                   planKey="pro"
                   showPayment={subscriptionInfo.plan !== 'pro'}
+                  user={user}
                 />
                 {/* BUSINESS PLAN CARD */}
                 <PlanCard
@@ -564,6 +566,7 @@ function App() {
                   onSelect={() => { AnalyticsService.planUpgradeClick('business', subscriptionInfo.plan); handleUpgrade('business'); }}
                   planKey="business"
                   showPayment={subscriptionInfo.plan !== 'business'}
+                  user={user}
                 />
               </div>
               {planMessage && (
@@ -1368,7 +1371,7 @@ function App() {
 export default App;
 
 /* ========= Plan Card Component (inline for brevity) ========= */
-function PlanCard({ title, accent, priceText, bulletPoints, actionLabel, onSelect, disabled, current, highlight, planKey, showPayment }) {
+function PlanCard({ title, accent, priceText, bulletPoints, actionLabel, onSelect, disabled, current, highlight, planKey, showPayment, user }) {
   const [paymentMethods, setPaymentMethods] = React.useState([]);
   const [selectedMethod, setSelectedMethod] = React.useState(null);
   const [showInstructions, setShowInstructions] = React.useState(false);
@@ -1384,19 +1387,29 @@ function PlanCard({ title, accent, priceText, bulletPoints, actionLabel, onSelec
   const handlePaymentMethodSelect = async (method) => {
     setSelectedMethod(method);
     try {
+      // Get user email from Firebase auth or use a default
+      const userEmail = user?.email || 'customer@example.com';
+      
       const result = await PayoneerService.processPayment(
         method, 
         { key: planKey, price: planKey === 'pro' ? 9.99 : 19.99 },
-        { email: 'user@example.com' } // This should come from actual user data
+        { email: userEmail }
       );
+      
+      console.log('Payment processing result:', result);
       
       if (result.success) {
         setPaymentInstructions(result.instructions);
         setShowInstructions(true);
+        
+        // Track payment event
+        PayoneerService.trackPaymentEvent('payment_method_selected', planKey, method.id);
+      } else {
+        throw new Error('Payment processing failed');
       }
     } catch (error) {
       console.error('Payment processing error:', error);
-      alert('Error processing payment. Please try again.');
+      alert(`Error processing payment: ${error.message}. Please try again.`);
     }
   };
 
