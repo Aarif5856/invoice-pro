@@ -7,7 +7,8 @@ import {
   StorageService, 
   CurrencyService,
   FirebaseService,
-  AnalyticsService
+  AnalyticsService,
+  PayPalService
 } from './services';
 import { SubscriptionService } from './services/SubscriptionService';
 
@@ -60,6 +61,7 @@ function App() {
   const [subscriptionInfo, setSubscriptionInfo] = useState(() => SubscriptionService.getSubscriptionInfo());
   const [showPlans, setShowPlans] = useState(false); // toggle plan selection UI
   const [planMessage, setPlanMessage] = useState('');
+  const [paymentProcessing, setPaymentProcessing] = useState({});
   
   // Update subscription info when usage changes
   const updateSubscriptionInfo = () => {
@@ -69,23 +71,46 @@ function App() {
   const handleUpgrade = (plan) => {
     try {
       if (plan === subscriptionInfo.plan) return; // no change
-      // store chosen plan
-      const userDataRaw = localStorage.getItem('userData') || '{}';
-      const userData = JSON.parse(userDataRaw);
-      userData.plan = plan;
-      userData.planChangedAt = new Date().toISOString();
-      localStorage.setItem('userData', JSON.stringify(userData));
-      // refresh info
-      updateSubscriptionInfo();
-      setPlanMessage(`Plan updated to ${plan.toUpperCase()} successfully.`);
-  AnalyticsService.planUpgradeSuccess(plan, subscriptionInfo.plan);
-      // If moving from free to paid, remove watermark flag by reloading banner state (handled by info)
+      
+      // For free plan, allow immediate switch
+      if (plan === 'free') {
+        const userDataRaw = localStorage.getItem('userData') || '{}';
+        const userData = JSON.parse(userDataRaw);
+        userData.plan = plan;
+        userData.planChangedAt = new Date().toISOString();
+        localStorage.setItem('userData', JSON.stringify(userData));
+        updateSubscriptionInfo();
+        setPlanMessage(`Plan updated to ${plan.toUpperCase()} successfully.`);
+        AnalyticsService.planUpgradeSuccess(plan, subscriptionInfo.plan);
+        return;
+      }
+      
+      // For paid plans, show payment processing message
+      setPlanMessage(`Redirecting to PayPal for ${plan.toUpperCase()} plan payment...`);
+      AnalyticsService.planUpgradeSuccess(plan, subscriptionInfo.plan);
     } catch (e) {
       setPlanMessage('Failed to update plan.');
     }
   };
 
-  // Validation functions delegated to ValidationService
+  const handlePaymentSuccess = (plan, subscriptionInfo) => {
+    updateSubscriptionInfo();
+    setPlanMessage(`🎉 Successfully upgraded to ${plan.toUpperCase()} plan! Welcome to unlimited features.`);
+    setPaymentProcessing(prev => ({ ...prev, [plan]: false }));
+    PayPalService.trackPaymentEvent('success', plan);
+  };
+
+  const handlePaymentError = (plan, error) => {
+    setPlanMessage(`❌ Payment failed for ${plan.toUpperCase()} plan. Please try again.`);
+    setPaymentProcessing(prev => ({ ...prev, [plan]: false }));
+    PayPalService.trackPaymentEvent('error', plan, error);
+  };
+
+  const handlePaymentCancel = (plan) => {
+    setPlanMessage(`Payment cancelled for ${plan.toUpperCase()} plan.`);
+    setPaymentProcessing(prev => ({ ...prev, [plan]: false }));
+    PayPalService.trackPaymentEvent('cancel', plan);
+  };  // Validation functions delegated to ValidationService
   const validateInvoice = (invoiceData) => ValidationService.validateInvoice(invoiceData);
   const validateReceipt = (receiptData) => ValidationService.validateReceipt(receiptData);
   const getFieldError = (fieldName) => ValidationService.getFieldError(validationErrors, fieldName);
@@ -500,6 +525,8 @@ function App() {
                   actionLabel={subscriptionInfo.plan === 'free' ? 'Current Plan' : 'Switch'}
                   disabled={subscriptionInfo.plan === 'free'}
                   onSelect={() => { AnalyticsService.planUpgradeClick('free', subscriptionInfo.plan); handleUpgrade('free'); }}
+                  planKey="free"
+                  showPayment={false}
                 />
                 {/* PRO PLAN CARD */}
                 <PlanCard
@@ -517,6 +544,8 @@ function App() {
                   actionLabel={subscriptionInfo.plan === 'pro' ? 'Current Plan' : (subscriptionInfo.plan === 'free' ? 'Upgrade' : 'Switch')}
                   disabled={subscriptionInfo.plan === 'pro'}
                   onSelect={() => { AnalyticsService.planUpgradeClick('pro', subscriptionInfo.plan); handleUpgrade('pro'); }}
+                  planKey="pro"
+                  showPayment={subscriptionInfo.plan !== 'pro'}
                 />
                 {/* BUSINESS PLAN CARD */}
                 <PlanCard
@@ -533,6 +562,8 @@ function App() {
                   actionLabel={subscriptionInfo.plan === 'business' ? 'Current Plan' : 'Upgrade'}
                   disabled={subscriptionInfo.plan === 'business'}
                   onSelect={() => { AnalyticsService.planUpgradeClick('business', subscriptionInfo.plan); handleUpgrade('business'); }}
+                  planKey="business"
+                  showPayment={subscriptionInfo.plan !== 'business'}
                 />
               </div>
               {planMessage && (
@@ -1337,7 +1368,32 @@ function App() {
 export default App;
 
 /* ========= Plan Card Component (inline for brevity) ========= */
-function PlanCard({ title, accent, priceText, bulletPoints, actionLabel, onSelect, disabled, current, highlight }) {
+function PlanCard({ title, accent, priceText, bulletPoints, actionLabel, onSelect, disabled, current, highlight, planKey, showPayment }) {
+  const paypalContainerId = `paypal-${planKey}-${Date.now()}`;
+  
+  React.useEffect(() => {
+    if (showPayment && planKey !== 'free') {
+      const timer = setTimeout(() => {
+        PayPalService.renderPayPalButton(
+          paypalContainerId,
+          planKey,
+          (subscriptionInfo) => {
+            console.log('Payment success:', subscriptionInfo);
+            // This will be handled by the parent component
+          },
+          (error) => {
+            console.error('Payment error:', error);
+          },
+          (data) => {
+            console.log('Payment cancelled:', data);
+          }
+        );
+      }, 100);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [showPayment, planKey]);
+
   return (
     <div style={{
       flex: '1 1 260px',
@@ -1362,23 +1418,30 @@ function PlanCard({ title, accent, priceText, bulletPoints, actionLabel, onSelec
           </li>
         ))}
       </ul>
-      <button
-        disabled={disabled}
-        onClick={onSelect}
-        style={{
-          marginTop:18,
-          width:'100%',
-          background: disabled ? '#d3d8e2' : accent,
-          color:'#fff',
-          border:'none',
-          padding:'12px 14px',
-          borderRadius:10,
-          cursor: disabled ? 'not-allowed' : 'pointer',
-          fontWeight:600,
-          fontSize:14,
-          letterSpacing:'.3px'
-        }}
-      >{actionLabel}</button>
+      
+      {showPayment && planKey !== 'free' ? (
+        <div style={{marginTop:18}}>
+          <div id={paypalContainerId} style={{minHeight:40}}></div>
+        </div>
+      ) : (
+        <button
+          disabled={disabled}
+          onClick={onSelect}
+          style={{
+            marginTop:18,
+            width:'100%',
+            background: disabled ? '#d3d8e2' : accent,
+            color:'#fff',
+            border:'none',
+            padding:'12px 14px',
+            borderRadius:10,
+            cursor: disabled ? 'not-allowed' : 'pointer',
+            fontWeight:600,
+            fontSize:14,
+            letterSpacing:'.3px'
+          }}
+        >{actionLabel}</button>
+      )}
     </div>
   );
 }
