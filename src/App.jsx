@@ -475,19 +475,7 @@ function App() {
                 <button
                   onClick={() => { 
                     AnalyticsService.planUpgradeClick('view_plans', subscriptionInfo.plan); 
-                    console.log('Upgrade Plan clicked, current showPlans:', showPlans);
-                    
-                    if (!showPlans) {
-                      // Show plans
-                      setShowPlans(true);
-                      console.log('Setting showPlans to true');
-                    } else {
-                      // Hide plans and reset
-                      setShowPlans(false);
-                      setSelectedPlanForPayment(null);
-                      setPlanMessage('');
-                      console.log('Setting showPlans to false');
-                    }
+                    setShowPlans(!showPlans);
                   }}
                   style={{
                     background: '#fff',
@@ -519,8 +507,7 @@ function App() {
             )}
           </div>
 
-          {console.log('Rendering plans section, showPlans:', showPlans)}
-          {showPlans ? (
+          {showPlans && (
             <div style={{
               margin: '0 20px 25px 20px',
               background: '#ffffff',
@@ -599,7 +586,7 @@ function App() {
                 <div style={{marginTop:20,fontSize:14,fontWeight:500,color:'#1a1f29'}}>{planMessage}</div>
               )}
             </div>
-          ) : null}
+          )}
 
           <nav className="nav">
             <button className={`nav-btn${formType === 'invoice' ? ' active' : ''}`} onClick={() => setFormType('invoice')}>Create Invoice</button>
