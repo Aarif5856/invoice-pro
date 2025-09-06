@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "./firebase/firebase.js";
 
-export default function Auth({ onAuthChange, isLoggingOut } = {}) {
+export default function Auth({ onAuthChange, onUserChange, isLoggingOut } = {}) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -35,6 +35,7 @@ export default function Auth({ onAuthChange, isLoggingOut } = {}) {
         console.log('Firebase auth state changed:', u);
         setUser(u);
         if (typeof onAuthChange === 'function') onAuthChange(!!u);
+        if (typeof onUserChange === 'function') onUserChange(u);
       });
       return () => unsub();
     }

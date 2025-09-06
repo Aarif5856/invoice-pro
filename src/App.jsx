@@ -28,6 +28,7 @@ function App() {
   const [receipt, setReceipt] = useState(initialReceipt);
   const [isAuthenticated, setIsAuthenticated] = useState(false); // Start with false, require manual login
   const [isLoggingOut, setIsLoggingOut] = useState(false); // Track logout state
+  const [user, setUser] = useState(null); // Store user data from authentication
   const [uploading, setUploading] = useState(false);
   const [uploadMessage, setUploadMessage] = useState('');
   
@@ -396,7 +397,11 @@ function App() {
 
       {!isAuthenticated ? (
         <main className="main-content">
-          <Auth onAuthChange={setIsAuthenticated} isLoggingOut={isLoggingOut} />
+          <Auth 
+            onAuthChange={setIsAuthenticated} 
+            onUserChange={setUser}
+            isLoggingOut={isLoggingOut} 
+          />
         </main>
       ) : (
         <>
