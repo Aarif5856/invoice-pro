@@ -1,22 +1,100 @@
-// PayPal payment processing service
-class PayPalService {
+// Multi-payment service for Sri Lanka users
+class PaymentService {
   constructor() {
     this.plans = {
       pro: {
-        planId: 'P-2UF78835G6983834MNL6MI2A', // Replace with actual PayPal plan ID
+        planId: 'YOUR_ACTUAL_PRO_PLAN_ID',
         price: 9.99,
+        lkrPrice: 3000, // Approximate LKR equivalent
         currency: 'USD',
         interval: 'month'
       },
       business: {
-        planId: 'P-5ML55832H6983834MNL6MQLA', // Replace with actual PayPal plan ID
+        planId: 'YOUR_ACTUAL_BUSINESS_PLAN_ID',
         price: 19.99,
+        lkrPrice: 6000, // Approximate LKR equivalent
         currency: 'USD',
         interval: 'month'
       }
     };
+
+    // Sri Lankan bank details for local transfers
+    this.bankDetails = {
+      bankName: 'Commercial Bank of Ceylon',
+      accountName: 'Your Business Name',
+      accountNumber: 'XXXX-XXXX-XXXX-XXXX',
+      branch: 'Colombo Main Branch',
+      swiftCode: 'CCEYLKLX',
+      email: 'payments@invoicepro.tech'
+    };
   }
 
+  // Check if user is in Sri Lanka or restricted region
+  isRestrictedRegion() {
+    // You can implement geo-detection here
+    return true; // Assume Sri Lanka for now
+  }
+
+  getAvailablePaymentMethods() {
+    if (this.isRestrictedRegion()) {
+      return [
+        { id: 'bank_transfer', name: 'Bank Transfer (LKR)', recommended: true },
+        { id: 'wise', name: 'Wise (formerly TransferWise)', recommended: false },
+        { id: 'crypto', name: 'Cryptocurrency', recommended: false },
+        { id: 'remitly', name: 'Remitly', recommended: false }
+      ];
+    } else {
+      return [
+        { id: 'paypal', name: 'PayPal', recommended: true },
+        { id: 'stripe', name: 'Credit Card', recommended: true },
+        { id: 'bank_transfer', name: 'Bank Transfer', recommended: false }
+      ];
+    }
+  }
+
+  generateBankTransferInstructions(planKey) {
+    const plan = this.plans[planKey];
+    if (!plan) {
+      throw new Error(`Plan ${planKey} not found`);
+    }
+
+    const referenceId = `INV-${planKey.toUpperCase()}-${Date.now()}`;
+    
+    return {
+      referenceId,
+      amount: plan.lkrPrice,
+      currency: 'LKR',
+      bankDetails: this.bankDetails,
+      instructions: [
+        `Transfer LKR ${plan.lkrPrice.toLocaleString()} to the account below`,
+        `Reference: ${referenceId}`,
+        `Email payment slip to: ${this.bankDetails.email}`,
+        `Include your account email in the transfer description`,
+        `Account will be activated within 24 hours of payment confirmation`
+      ],
+      note: 'This is a manual process. Please allow 24 hours for activation.'
+    };
+  }
+
+  // Alternative payment methods for Sri Lanka
+  getWisePaymentLink(planKey) {
+    const plan = this.plans[planKey];
+    return `https://wise.com/send?amount=${plan.price}&currency=USD&recipient=your-wise-account`;
+  }
+
+  getCryptoPaymentDetails(planKey) {
+    const plan = this.plans[planKey];
+    return {
+      btcAddress: 'bc1qYourBitcoinAddress',
+      ethAddress: '0xYourEthereumAddress', 
+      usdtAddress: 'YourUSDTTRC20Address',
+      amount: plan.price,
+      currency: 'USD',
+      note: 'Send payment confirmation screenshot to payments@invoicepro.tech'
+    };
+  }
+
+  // For regions where PayPal works
   isPayPalLoaded() {
     return typeof window !== 'undefined' && typeof window.paypal !== 'undefined';
   }
@@ -156,4 +234,4 @@ class PayPalService {
   }
 }
 
-export default new PayPalService();
+export default new PaymentService();

@@ -8,7 +8,7 @@ import {
   CurrencyService,
   FirebaseService,
   AnalyticsService,
-  PayPalService
+  PayoneerService
 } from './services';
 import { SubscriptionService } from './services/SubscriptionService';
 
@@ -86,7 +86,7 @@ function App() {
       }
       
       // For paid plans, show payment processing message
-      setPlanMessage(`Redirecting to PayPal for ${plan.toUpperCase()} plan payment...`);
+      setPlanMessage(`Redirecting to payment options for ${plan.toUpperCase()} plan...`);
       AnalyticsService.planUpgradeSuccess(plan, subscriptionInfo.plan);
     } catch (e) {
       setPlanMessage('Failed to update plan.');
@@ -97,19 +97,19 @@ function App() {
     updateSubscriptionInfo();
     setPlanMessage(`🎉 Successfully upgraded to ${plan.toUpperCase()} plan! Welcome to unlimited features.`);
     setPaymentProcessing(prev => ({ ...prev, [plan]: false }));
-    PayPalService.trackPaymentEvent('success', plan);
+    PayoneerService.trackPaymentEvent('success', plan);
   };
 
   const handlePaymentError = (plan, error) => {
     setPlanMessage(`❌ Payment failed for ${plan.toUpperCase()} plan. Please try again.`);
     setPaymentProcessing(prev => ({ ...prev, [plan]: false }));
-    PayPalService.trackPaymentEvent('error', plan, error);
+    PayoneerService.trackPaymentEvent('error', plan, error);
   };
 
   const handlePaymentCancel = (plan) => {
     setPlanMessage(`Payment cancelled for ${plan.toUpperCase()} plan.`);
     setPaymentProcessing(prev => ({ ...prev, [plan]: false }));
-    PayPalService.trackPaymentEvent('cancel', plan);
+    PayoneerService.trackPaymentEvent('cancel', plan);
   };  // Validation functions delegated to ValidationService
   const validateInvoice = (invoiceData) => ValidationService.validateInvoice(invoiceData);
   const validateReceipt = (receiptData) => ValidationService.validateReceipt(receiptData);
@@ -1369,30 +1369,36 @@ export default App;
 
 /* ========= Plan Card Component (inline for brevity) ========= */
 function PlanCard({ title, accent, priceText, bulletPoints, actionLabel, onSelect, disabled, current, highlight, planKey, showPayment }) {
-  const paypalContainerId = `paypal-${planKey}-${Date.now()}`;
+  const [paymentMethods, setPaymentMethods] = React.useState([]);
+  const [selectedMethod, setSelectedMethod] = React.useState(null);
+  const [showInstructions, setShowInstructions] = React.useState(false);
+  const [paymentInstructions, setPaymentInstructions] = React.useState(null);
   
   React.useEffect(() => {
     if (showPayment && planKey !== 'free') {
-      const timer = setTimeout(() => {
-        PayPalService.renderPayPalButton(
-          paypalContainerId,
-          planKey,
-          (subscriptionInfo) => {
-            console.log('Payment success:', subscriptionInfo);
-            // This will be handled by the parent component
-          },
-          (error) => {
-            console.error('Payment error:', error);
-          },
-          (data) => {
-            console.log('Payment cancelled:', data);
-          }
-        );
-      }, 100);
-      
-      return () => clearTimeout(timer);
+      const methods = PayoneerService.getAvailablePaymentMethods();
+      setPaymentMethods(methods);
     }
   }, [showPayment, planKey]);
+
+  const handlePaymentMethodSelect = async (method) => {
+    setSelectedMethod(method);
+    try {
+      const result = await PayoneerService.processPayment(
+        method, 
+        { key: planKey, price: planKey === 'pro' ? 9.99 : 19.99 },
+        { email: 'user@example.com' } // This should come from actual user data
+      );
+      
+      if (result.success) {
+        setPaymentInstructions(result.instructions);
+        setShowInstructions(true);
+      }
+    } catch (error) {
+      console.error('Payment processing error:', error);
+      alert('Error processing payment. Please try again.');
+    }
+  };
 
   return (
     <div style={{
@@ -1421,7 +1427,66 @@ function PlanCard({ title, accent, priceText, bulletPoints, actionLabel, onSelec
       
       {showPayment && planKey !== 'free' ? (
         <div style={{marginTop:18}}>
-          <div id={paypalContainerId} style={{minHeight:40}}></div>
+          {!showInstructions ? (
+            <div>
+              <h5 style={{margin:'0 0 10px',fontSize:14,fontWeight:600,color:'#1f2735'}}>Choose Payment Method:</h5>
+              {paymentMethods.map((method) => (
+                <button
+                  key={method.id}
+                  onClick={() => handlePaymentMethodSelect(method)}
+                  style={{
+                    width:'100%',
+                    margin:'4px 0',
+                    padding:'8px 12px',
+                    background: method.recommended ? accent : '#f8f9fa',
+                    color: method.recommended ? '#fff' : '#333',
+                    border: method.recommended ? 'none' : '1px solid #ddd',
+                    borderRadius:8,
+                    cursor:'pointer',
+                    fontSize:12,
+                    fontWeight:500,
+                    display:'flex',
+                    alignItems:'center',
+                    justifyContent:'space-between'
+                  }}
+                >
+                  <span>{method.icon} {method.name}</span>
+                  {method.recommended && <span style={{fontSize:10}}>⭐</span>}
+                </button>
+              ))}
+            </div>
+          ) : (
+            <div style={{fontSize:12,lineHeight:1.4}}>
+              <h5 style={{margin:'0 0 8px',fontSize:14,fontWeight:600,color:'#1f2735'}}>Payment Instructions:</h5>
+              <div style={{background:'#f8f9fa',padding:12,borderRadius:8,marginBottom:10}}>
+                <strong>Reference ID:</strong> {paymentInstructions?.referenceId}
+              </div>
+              {paymentInstructions?.instructions?.map((instruction, i) => (
+                <div key={i} style={{margin:'4px 0',padding:'4px 0',borderBottom:i < paymentInstructions.instructions.length - 1 ? '1px solid #eee' : 'none'}}>
+                  {instruction}
+                </div>
+              ))}
+              <div style={{marginTop:10,padding:8,background:'#e8f5e8',borderRadius:6,fontSize:11}}>
+                <strong>Activation Time:</strong> {paymentInstructions?.activationTime || 'Within 24 hours'}
+              </div>
+              <button
+                onClick={() => {setShowInstructions(false); setSelectedMethod(null);}}
+                style={{
+                  marginTop:10,
+                  width:'100%',
+                  background:'#6c757d',
+                  color:'#fff',
+                  border:'none',
+                  padding:'8px',
+                  borderRadius:6,
+                  cursor:'pointer',
+                  fontSize:12
+                }}
+              >
+                ← Back to Payment Methods
+              </button>
+            </div>
+          )}
         </div>
       ) : (
         <button
