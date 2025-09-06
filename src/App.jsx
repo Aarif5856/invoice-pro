@@ -475,19 +475,18 @@ function App() {
                 <button
                   onClick={() => { 
                     AnalyticsService.planUpgradeClick('view_plans', subscriptionInfo.plan); 
-                    if (showPlans && selectedPlanForPayment) {
-                      // If plans are shown and a plan is selected, reset and hide
-                      setSelectedPlanForPayment(null);
-                      setShowPlans(false);
-                      setPlanMessage('');
-                    } else {
+                    console.log('Upgrade Plan clicked, current showPlans:', showPlans);
+                    
+                    if (!showPlans) {
                       // Show plans
                       setShowPlans(true);
-                      // If user is on free plan, auto-focus on Pro plan for payment
-                      if (subscriptionInfo.plan === 'free') {
-                        setSelectedPlanForPayment('pro');
-                        setPlanMessage('Select your preferred payment method for PRO plan:');
-                      }
+                      console.log('Setting showPlans to true');
+                    } else {
+                      // Hide plans and reset
+                      setShowPlans(false);
+                      setSelectedPlanForPayment(null);
+                      setPlanMessage('');
+                      console.log('Setting showPlans to false');
                     }
                   }}
                   style={{
@@ -520,7 +519,8 @@ function App() {
             )}
           </div>
 
-          {showPlans && (
+          {console.log('Rendering plans section, showPlans:', showPlans)}
+          {showPlans ? (
             <div style={{
               margin: '0 20px 25px 20px',
               background: '#ffffff',
@@ -529,6 +529,9 @@ function App() {
               boxShadow: '0 6px 28px rgba(0,0,0,0.08)',
               border: '1px solid #eef2f7'
             }}>
+              <h3 style={{margin:'0 0 20px 0',fontSize:20,fontWeight:700,color:'#1f2735',textAlign:'center'}}>
+                Choose Your Plan
+              </h3>
               <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',flexWrap:'wrap',gap: '22px'}}>
                 {/* FREE PLAN CARD */}
                 <PlanCard
@@ -596,7 +599,7 @@ function App() {
                 <div style={{marginTop:20,fontSize:14,fontWeight:500,color:'#1a1f29'}}>{planMessage}</div>
               )}
             </div>
-          )}
+          ) : null}
 
           <nav className="nav">
             <button className={`nav-btn${formType === 'invoice' ? ' active' : ''}`} onClick={() => setFormType('invoice')}>Create Invoice</button>

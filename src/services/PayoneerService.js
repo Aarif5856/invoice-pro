@@ -53,7 +53,7 @@ class PayoneerService {
     return [
       { 
         id: 'payoneer_direct', 
-        name: 'Payoneer (Recommended)', 
+        name: 'Payoneer', 
         recommended: true,
         description: 'Send money directly to Payoneer account - instant',
         fees: 'Small Payoneer fee applies',
@@ -61,27 +61,11 @@ class PayoneerService {
       },
       { 
         id: 'payoneer_gps', 
-        name: 'Wire Transfer (USD)', 
-        recommended: true,
-        description: 'Bank wire to Payoneer Global Payment Service',
+        name: 'Wire Transfer', 
+        recommended: false,
+        description: 'International bank wire transfer',
         fees: 'Bank charges may apply',
         icon: '🏦'
-      },
-      { 
-        id: 'qatar_bank_transfer', 
-        name: 'Qatar Bank Transfer (QAR)', 
-        recommended: false,
-        description: 'Direct transfer to Qatar bank account',
-        fees: 'No additional fees',
-        icon: '🇶🇦'
-      },
-      {
-        id: 'crypto',
-        name: 'Cryptocurrency',
-        recommended: false,
-        description: 'Bitcoin, Ethereum, USDT',
-        fees: 'Network fees apply',
-        icon: '₿'
       }
     ];
   }
