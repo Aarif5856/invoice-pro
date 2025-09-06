@@ -18,8 +18,9 @@ class PayoneerService {
 
     // Your Qatar Payoneer account details
     this.payoneerDetails = {
-      email: 'your-payoneer-email@gmail.com', // Replace with your actual Payoneer email
-      receiverName: 'Your Full Name', // As registered in Payoneer
+      email: '5856music@gmail.com', // Your approved Payoneer email
+      receiverName: 'Mohamed Aarif Abdul Majeed', // As registered in Payoneer
+      customerId: '98977720', // Your Payoneer Customer ID
       country: 'Qatar',
       currency: 'USD',
       // Payoneer Global Payment Service details (you'll get these after approval)
@@ -43,7 +44,7 @@ class PayoneerService {
       iban: 'QA XX QNBA XXXX XXXX XXXX XXXX XXXX XX', // Replace with your IBAN
       swiftCode: 'QNBAQAQA',
       branch: 'Doha Main Branch',
-      email: 'payments@invoicepro.tech'
+      email: '5856music@gmail.com' // Your email for payment confirmations
     };
   }
 

@@ -3,6 +3,11 @@
 ## Overview
 Invoice Pro has been updated to support payment processing for Qatar-based operations using Payoneer as the primary payment provider.
 
+**Account Holder:** Mohamed Aarif Abdul Majeed  
+**Payoneer Email:** 5856music@gmail.com  
+**Customer ID:** 98977720  
+**Location:** Qatar  
+
 ## Payment Methods Available
 
 ### 1. Payoneer Direct (Recommended) 💳
@@ -33,22 +38,22 @@ Invoice Pro has been updated to support payment processing for Qatar-based opera
 
 ## Setup Required
 
-### 1. Update PayoneerService.js
+### 1. Update PayoneerService.js ✅ COMPLETED
 ```javascript
-// Your Payoneer account details
+// Your Payoneer account details - LIVE
 payoneerDetails: {
-  email: 'your-payoneer-email@domain.com',
-  accountId: 'YOUR_PAYONEER_ACCOUNT_ID'
+  email: '5856music@gmail.com',
+  receiverName: 'Mohamed Aarif Abdul Majeed',
+  customerId: '98977720',
+  country: 'Qatar'
 }
 
 // Your Qatar bank details  
-localBankDetails: {
-  bankName: 'Qatar National Bank',
-  accountName: 'Your Business Name',
-  accountNumber: 'YOUR_QNB_ACCOUNT_NUMBER',
-  iban: 'QA58QNBA000000000000693123456',
-  swiftCode: 'QNBAQAQA',
-  email: 'payments@yourbusiness.com'
+qatarBankDetails: {
+  bankName: 'Qatar National Bank (QNB)',
+  accountName: 'Mohamed Aarif Abdul Majeed', // Update with your business name if different
+  // Add your actual QNB account details when ready
+  email: '5856music@gmail.com' // Payment confirmations email
 }
 ```
 
@@ -94,10 +99,18 @@ Currently set up for manual verification. All payment confirmations are processe
 5. Implement automated email notifications
 6. Add payment status dashboard for admin
 
-## Support
-For payment issues, customers should email: payments@yourbusiness.com
+## Support ✅ LIVE
+For payment issues, customers should email: **5856music@gmail.com**  
 Include Reference ID and payment confirmation details.
 
+**Next Steps for Mohamed Aarif:**
+1. ✅ Payoneer account approved and integrated
+2. 🔄 Complete Payoneer account setup and get Global Payment Service details
+3. 🔄 Add Qatar National Bank account details to PayoneerService.js
+4. 🔄 Test payment flow on your production domain
+5. 🔄 Set up automated email notifications for payment confirmations
+
 ---
-*Last updated: December 2024*
-*Qatar-based Payoneer integration*
+*Last updated: September 2025*  
+*Qatar-based Payoneer integration - LIVE ACCOUNT*  
+*Account: Mohamed Aarif Abdul Majeed (5856music@gmail.com)*
