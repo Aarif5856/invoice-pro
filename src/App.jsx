@@ -62,6 +62,7 @@ function App() {
   const [showPlans, setShowPlans] = useState(false); // toggle plan selection UI
   const [planMessage, setPlanMessage] = useState('');
   const [paymentProcessing, setPaymentProcessing] = useState({});
+  const [selectedPlanForPayment, setSelectedPlanForPayment] = useState(null); // track which plan is selected for payment
   
   // Update subscription info when usage changes
   const updateSubscriptionInfo = () => {
@@ -86,7 +87,8 @@ function App() {
       }
       
       // For paid plans, show payment processing message
-      setPlanMessage(`Redirecting to payment options for ${plan.toUpperCase()} plan...`);
+      setPlanMessage(`Select your preferred payment method for ${plan.toUpperCase()} plan:`);
+      setSelectedPlanForPayment(plan); // Set the plan for payment selection
       AnalyticsService.planUpgradeSuccess(plan, subscriptionInfo.plan);
     } catch (e) {
       setPlanMessage('Failed to update plan.');
@@ -97,6 +99,7 @@ function App() {
     updateSubscriptionInfo();
     setPlanMessage(`🎉 Successfully upgraded to ${plan.toUpperCase()} plan! Welcome to unlimited features.`);
     setPaymentProcessing(prev => ({ ...prev, [plan]: false }));
+    setSelectedPlanForPayment(null); // Reset payment selection
     PayoneerService.trackPaymentEvent('success', plan);
   };
 
@@ -109,6 +112,7 @@ function App() {
   const handlePaymentCancel = (plan) => {
     setPlanMessage(`Payment cancelled for ${plan.toUpperCase()} plan.`);
     setPaymentProcessing(prev => ({ ...prev, [plan]: false }));
+    setSelectedPlanForPayment(null); // Reset payment selection
     PayoneerService.trackPaymentEvent('cancel', plan);
   };  // Validation functions delegated to ValidationService
   const validateInvoice = (invoiceData) => ValidationService.validateInvoice(invoiceData);
@@ -528,6 +532,7 @@ function App() {
                   planKey="free"
                   showPayment={false}
                   user={user}
+                  onCancelPayment={() => setSelectedPlanForPayment(null)}
                 />
                 {/* PRO PLAN CARD */}
                 <PlanCard
@@ -546,8 +551,9 @@ function App() {
                   disabled={subscriptionInfo.plan === 'pro'}
                   onSelect={() => { AnalyticsService.planUpgradeClick('pro', subscriptionInfo.plan); handleUpgrade('pro'); }}
                   planKey="pro"
-                  showPayment={subscriptionInfo.plan !== 'pro'}
+                  showPayment={selectedPlanForPayment === 'pro'}
                   user={user}
+                  onCancelPayment={() => setSelectedPlanForPayment(null)}
                 />
                 {/* BUSINESS PLAN CARD */}
                 <PlanCard
@@ -565,8 +571,9 @@ function App() {
                   disabled={subscriptionInfo.plan === 'business'}
                   onSelect={() => { AnalyticsService.planUpgradeClick('business', subscriptionInfo.plan); handleUpgrade('business'); }}
                   planKey="business"
-                  showPayment={subscriptionInfo.plan !== 'business'}
+                  showPayment={selectedPlanForPayment === 'business'}
                   user={user}
+                  onCancelPayment={() => setSelectedPlanForPayment(null)}
                 />
               </div>
               {planMessage && (
@@ -1371,7 +1378,7 @@ function App() {
 export default App;
 
 /* ========= Plan Card Component (inline for brevity) ========= */
-function PlanCard({ title, accent, priceText, bulletPoints, actionLabel, onSelect, disabled, current, highlight, planKey, showPayment, user }) {
+function PlanCard({ title, accent, priceText, bulletPoints, actionLabel, onSelect, disabled, current, highlight, planKey, showPayment, user, onCancelPayment }) {
   const [paymentMethods, setPaymentMethods] = React.useState([]);
   const [selectedMethod, setSelectedMethod] = React.useState(null);
   const [showInstructions, setShowInstructions] = React.useState(false);
@@ -1467,6 +1474,23 @@ function PlanCard({ title, accent, priceText, bulletPoints, actionLabel, onSelec
                   {method.recommended && <span style={{fontSize:10}}>⭐</span>}
                 </button>
               ))}
+              <button
+                onClick={onCancelPayment}
+                style={{
+                  width:'100%',
+                  margin:'8px 0 0 0',
+                  padding:'8px 12px',
+                  background:'#f8f9fa',
+                  color:'#666',
+                  border:'1px solid #ddd',
+                  borderRadius:8,
+                  cursor:'pointer',
+                  fontSize:12,
+                  fontWeight:500
+                }}
+              >
+                ← Cancel Payment
+              </button>
             </div>
           ) : (
             <div style={{fontSize:12,lineHeight:1.4}}>
