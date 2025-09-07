@@ -202,12 +202,18 @@
   font-size: var(--text-base);
   transition: all var(--transition-fast);
   background: white;
+  color: var(--gray-900);
+}
+
+.form-input::placeholder {
+  color: var(--gray-500);
 }
 
 .form-input:focus {
   outline: none;
   border-color: var(--primary-500);
   box-shadow: 0 0 0 3px var(--primary-100);
+  color: var(--gray-900);
 }
 
 .form-label {

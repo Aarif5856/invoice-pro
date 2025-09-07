@@ -174,17 +174,43 @@ body {
   font-size: var(--text-base);
   transition: all var(--transition-fast);
   background: white;
+  color: var(--gray-900);
+  font-family: var(--font-sans);
+}
+
+.form-input::placeholder {
+  color: var(--gray-500);
 }
 
 .form-input:focus {
   border-color: var(--primary-500);
   box-shadow: 0 0 0 4px var(--primary-100);
   outline: none;
+  color: var(--gray-900);
 }
 
 .form-input.small {
   padding: var(--space-3);
   font-size: var(--text-sm);
+}
+
+/* Fix for select elements */
+select.form-input {
+  color: var(--gray-900);
+  background: white;
+}
+
+select.form-input option {
+  color: var(--gray-900);
+  background: white;
+}
+
+/* Fix for textarea elements */
+textarea.form-input {
+  color: var(--gray-900);
+  background: white;
+  resize: vertical;
+  min-height: 80px;
 }
 
 /* Modern Button System */

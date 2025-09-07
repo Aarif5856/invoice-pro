@@ -72,6 +72,29 @@
   font-size: var(--text-sm);
 }
 
+/* Ensure form inputs in auth have proper text color */
+.auth-form .form-input {
+  color: var(--gray-900);
+  background: white;
+}
+
+.auth-form .form-input::placeholder {
+  color: var(--gray-500);
+}
+
+.auth-form .form-input:focus {
+  color: var(--gray-900);
+}
+
+.auth-form select.form-input {
+  color: var(--gray-900);
+}
+
+.auth-form select.form-input option {
+  color: var(--gray-900);
+  background: white;
+}
+
 .password-input-container {
   position: relative;
 }
