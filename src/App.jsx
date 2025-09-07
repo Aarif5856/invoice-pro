@@ -486,6 +486,7 @@ function App() {
                 </div>
                 
                 <button
+                  className="upgrade-btn"
                   onClick={() => { 
                     AnalyticsService.planUpgradeClick('view_plans', subscriptionInfo.plan); 
                     setShowPlans(!showPlans);

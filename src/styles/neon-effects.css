@@ -39,19 +39,48 @@
   width: 100%;
   height: 100%;
   background: linear-gradient(90deg, transparent, var(--neon-cyan-alpha), transparent);
-  transition: left 0.5s;
+  transition: left 0.7s ease;
+  z-index: 1;
+}
+
+.btn-neon::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(45deg, transparent 30%, var(--neon-cyan-alpha) 50%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 0;
 }
 
 .btn-neon:hover::before {
   left: 100%;
 }
 
+.btn-neon:hover::after {
+  opacity: 1;
+  animation: neon-sweep 2s infinite;
+}
+
 .btn-neon:hover {
   background: var(--neon-cyan) !important;
   color: var(--neon-dark) !important;
-  box-shadow: var(--neon-glow-lg) !important;
+  box-shadow: var(--neon-glow-xl) !important;
   text-shadow: none !important;
-  transform: translateY(-2px) !important;
+  transform: translateY(-3px) scale(1.02) !important;
+}
+
+.btn-neon:active {
+  transform: translateY(-1px) scale(0.98) !important;
+  box-shadow: var(--neon-glow-md) !important;
+}
+
+@keyframes neon-sweep {
+  0% { transform: translateX(-100%) skewX(-45deg); }
+  100% { transform: translateX(300%) skewX(-45deg); }
 }
 
 /* Neon Input Effects */
@@ -60,16 +89,33 @@
   border: 2px solid var(--neon-cyan) !important;
   color: var(--neon-cyan) !important;
   box-shadow: var(--neon-glow-sm) !important;
-  transition: all 0.3s ease !important;
+  transition: all 0.4s ease !important;
+  position: relative;
 }
 
 .form-input-neon::placeholder {
   color: var(--neon-cyan-bright) !important;
+  transition: color 0.3s ease;
 }
 
 .form-input-neon:focus {
-  box-shadow: var(--neon-glow-md) !important;
+  box-shadow: var(--neon-glow-lg) !important;
   border-color: var(--neon-cyan) !important;
+  transform: scale(1.02) !important;
+  animation: neon-input-pulse 2s infinite;
+}
+
+.form-input-neon:focus::placeholder {
+  color: var(--neon-cyan) !important;
+}
+
+@keyframes neon-input-pulse {
+  0%, 100% { 
+    box-shadow: var(--neon-glow-lg);
+  }
+  50% { 
+    box-shadow: var(--neon-glow-xl), inset 0 0 10px var(--neon-cyan-alpha);
+  }
 }
 
 /* Neon Card Effects */
@@ -111,6 +157,53 @@
   background: var(--neon-card) !important;
   border: 1px solid var(--neon-cyan) !important;
   box-shadow: var(--neon-glow-md) !important;
+}
+
+/* Neon Navigation Pills */
+.neon-mode .nav-pills .nav-pill {
+  border: 1px solid var(--neon-cyan) !important;
+  background: transparent !important;
+  color: var(--neon-cyan) !important;
+  transition: all 0.3s ease !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.neon-mode .nav-pills .nav-pill::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, var(--neon-cyan-alpha), transparent);
+  transition: left 0.5s ease;
+  z-index: 1;
+}
+
+.neon-mode .nav-pills .nav-pill:hover::before {
+  left: 100%;
+}
+
+.neon-mode .nav-pills .nav-pill:hover {
+  box-shadow: var(--neon-glow-md) !important;
+  transform: translateY(-2px) !important;
+}
+
+.neon-mode .nav-pills .nav-pill.active {
+  background: var(--neon-cyan) !important;
+  color: var(--neon-dark) !important;
+  box-shadow: var(--neon-glow-lg) !important;
+  animation: neon-active-pulse 3s infinite;
+}
+
+@keyframes neon-active-pulse {
+  0%, 100% { 
+    box-shadow: var(--neon-glow-lg);
+  }
+  50% { 
+    box-shadow: var(--neon-glow-xl);
+  }
 }
 
 .neon-mode .form-section {
@@ -215,12 +308,70 @@
   font-size: var(--text-sm);
   font-weight: 600;
   box-shadow: var(--neon-glow-sm);
+  animation: neon-toggle-breathe 4s infinite;
 }
 
 .neon-toggle:hover {
   background: var(--neon-cyan);
   color: var(--neon-dark);
-  box-shadow: var(--neon-glow-md);
+  box-shadow: var(--neon-glow-lg);
+  transform: scale(1.1);
+}
+
+@keyframes neon-toggle-breathe {
+  0%, 100% { 
+    box-shadow: var(--neon-glow-sm);
+    border-color: var(--neon-cyan);
+  }
+  50% { 
+    box-shadow: var(--neon-glow-md);
+    border-color: var(--primary-400);
+  }
+}
+
+/* Special Upgrade Button Glow */
+.neon-mode .upgrade-btn {
+  background: transparent !important;
+  border: 2px solid var(--neon-cyan) !important;
+  color: var(--neon-cyan) !important;
+  box-shadow: var(--neon-glow-md) !important;
+  animation: neon-upgrade-pulse 2s infinite !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.neon-mode .upgrade-btn::before {
+  content: '💎';
+  position: absolute;
+  top: 50%;
+  left: -30px;
+  transform: translateY(-50%);
+  font-size: 16px;
+  animation: neon-diamond-slide 3s infinite;
+  z-index: 2;
+}
+
+.neon-mode .upgrade-btn:hover {
+  background: var(--neon-cyan) !important;
+  color: var(--neon-dark) !important;
+  box-shadow: var(--neon-glow-xl) !important;
+  transform: scale(1.05) !important;
+}
+
+@keyframes neon-upgrade-pulse {
+  0%, 100% { 
+    box-shadow: var(--neon-glow-md);
+  }
+  50% { 
+    box-shadow: var(--neon-glow-xl), 0 0 40px var(--neon-cyan);
+  }
+}
+
+@keyframes neon-diamond-slide {
+  0% { left: -30px; opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { left: calc(100% + 10px); opacity: 0; }
 }
 
 /* Responsive Neon Effects */
