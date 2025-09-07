@@ -4,6 +4,7 @@ import './Pricing.css';
 
 const Pricing = ({ onPlanSelect, currentPlan = 'free' }) => {
   const [billingInterval, setBillingInterval] = useState('monthly');
+  const [hoveredPlan, setHoveredPlan] = useState(null);
 
   const plans = [
     {
@@ -16,14 +17,20 @@ const Pricing = ({ onPlanSelect, currentPlan = 'free' }) => {
       features: [
         '3 invoices per month',
         '3 receipts per month',
-        'Basic theme',
+        'Basic theme only',
         'Email support',
-        'Watermarked PDFs'
+        '⚠️ Watermarked PDFs'
       ],
       limitations: [
         'Limited to 3 documents/month',
         'Watermarked PDFs',
-        'Basic theme only'
+        'No premium themes',
+        'Basic support only'
+      ],
+      upgradeReasons: [
+        'Remove watermarks',
+        'Get unlimited documents',
+        'Access all themes'
       ]
     },
     {
@@ -34,13 +41,18 @@ const Pricing = ({ onPlanSelect, currentPlan = 'free' }) => {
       yearlyPrice: 99.99,
       popular: true,
       features: [
-        'Unlimited invoices & receipts',
-        'All premium themes',
-        'No watermarks',
-        'Client management',
-        'Priority support',
-        'PDF customization',
-        'Export history'
+        '✅ Unlimited invoices & receipts',
+        '✅ All premium themes',
+        '✅ No watermarks',
+        '✅ Client management',
+        '✅ Priority support',
+        '✅ PDF customization',
+        '✅ Export history'
+      ],
+      benefits: [
+        'Save time with unlimited documents',
+        'Professional look with no watermarks',
+        'Impress clients with premium themes'
       ]
     },
     {
@@ -114,10 +126,12 @@ const Pricing = ({ onPlanSelect, currentPlan = 'free' }) => {
         {plans.map(plan => (
           <div 
             key={plan.id} 
-            className={`pricing-card ${plan.popular ? 'popular' : ''} ${currentPlan === plan.id ? 'current' : ''}`}
+            className={`pricing-card ${plan.popular ? 'popular' : ''} ${currentPlan === plan.id ? 'current' : ''} ${hoveredPlan === plan.id ? 'hovered' : ''}`}
+            onMouseEnter={() => setHoveredPlan(plan.id)}
+            onMouseLeave={() => setHoveredPlan(null)}
           >
-            {plan.popular && <div className="popular-badge">Most Popular</div>}
-            {currentPlan === plan.id && <div className="current-badge">Current Plan</div>}
+            {plan.popular && <div className="popular-badge">🌟 Most Popular</div>}
+            {currentPlan === plan.id && <div className="current-badge">✅ Current Plan</div>}
             
             <div className="plan-header">
               <h3>{plan.name}</h3>
@@ -129,7 +143,7 @@ const Pricing = ({ onPlanSelect, currentPlan = 'free' }) => {
                 </span>
                 {billingInterval === 'yearly' && plan.price > 0 && (
                   <span className="savings">
-                    Save {getYearlySavings(plan.price, plan.yearlyPrice)}%
+                    💰 Save {getYearlySavings(plan.price, plan.yearlyPrice)}%
                   </span>
                 )}
               </div>
@@ -138,31 +152,42 @@ const Pricing = ({ onPlanSelect, currentPlan = 'free' }) => {
             <ul className="plan-features">
               {plan.features.map((feature, index) => (
                 <li key={index} className="feature-item">
-                  <span className="feature-check">✓</span>
+                  <span className="feature-check">{plan.id === 'free' && feature.includes('⚠️') ? '⚠️' : '✅'}</span>
                   {feature}
                 </li>
               ))}
             </ul>
 
-            {plan.limitations && (
-              <ul className="plan-limitations">
-                {plan.limitations.map((limitation, index) => (
-                  <li key={index} className="limitation-item">
-                    <span className="limitation-icon">⚠</span>
-                    {limitation}
-                  </li>
-                ))}
-              </ul>
+            {plan.limitations && plan.id === 'free' && hoveredPlan === 'free' && (
+              <div className="upgrade-reasons">
+                <h4>🚀 Upgrade to unlock:</h4>
+                <ul>
+                  {plan.upgradeReasons.map((reason, index) => (
+                    <li key={index}>{reason}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {plan.benefits && plan.id !== 'free' && hoveredPlan === plan.id && (
+              <div className="plan-benefits">
+                <h4>✨ Key Benefits:</h4>
+                <ul>
+                  {plan.benefits.map((benefit, index) => (
+                    <li key={index}>{benefit}</li>
+                  ))}
+                </ul>
+              </div>
             )}
 
             <button 
-              className={`plan-button ${currentPlan === plan.id ? 'current' : ''}`}
+              className={`plan-button ${currentPlan === plan.id ? 'current' : ''} ${plan.popular ? 'popular-btn' : ''}`}
               onClick={() => handlePlanSelect(plan.id)}
               disabled={currentPlan === plan.id}
             >
-              {currentPlan === plan.id ? 'Current Plan' : 
-               plan.id === 'free' ? 'Get Started Free' : 
-               `Upgrade to ${plan.name}`}
+              {currentPlan === plan.id ? '✅ Current Plan' : 
+               plan.id === 'free' ? '🆓 Get Started Free' : 
+               `💎 Upgrade to ${plan.name} - Only $${plan.price}/month`}
             </button>
           </div>
         ))}

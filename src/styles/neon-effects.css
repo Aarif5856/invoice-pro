@@ -11,33 +11,139 @@
   --neon-purple-alpha: #8b5cf633;
   --neon-purple-bright: #8b5cf699;
   
-  /* Neon Colors - Green Theme */
-  --neon-green: #10b981;
-  --neon-green-alpha: #10b98133;
-  --neon-green-bright: #10b98199;
-  
-  /* Neon Colors - Gold Theme */
-  --neon-gold: #f59e0b;
-  --neon-gold-alpha: #f59e0b33;
-  --neon-gold-bright: #f59e0b99;
-  
-  /* Dynamic Neon Color Variables */
-  --neon-primary: var(--neon-cyan);
-  --neon-primary-alpha: var(--neon-cyan-alpha);
-  --neon-primary-bright: var(--neon-cyan-bright);
-  
-  --neon-dark: #0d0d0d;
-  --neon-card: #1a1a1a;
-  
-  /* Neon Shadows */
-  --neon-glow-sm: 0 0 8px var(--neon-primary-alpha);
-  --neon-glow-md: 0 0 15px var(--neon-primary), 0 0 30px var(--neon-primary-alpha);
-  --neon-glow-lg: 0 0 25px var(--neon-primary), 0 0 50px var(--neon-primary-bright);
-  --neon-glow-xl: 0 0 35px var(--neon-primary), 0 0 70px var(--neon-primary-bright);
-  
-  /* Neon Text Shadow */
-  --neon-text-glow: 0 0 10px var(--neon-primary);
-  --neon-text-glow-lg: 0 0 20px var(--neon-primary), 0 0 30px var(--neon-primary);
+  /* Enhanced readability variables */
+  --neon-text-primary: #f1f5f9;
+  --neon-text-secondary: #e2e8f0;
+  --neon-text-muted: #cbd5e1;
+  --neon-bg-overlay: rgba(13, 13, 13, 0.85);
+}
+
+/* Neon Text Effects - Improved Readability */
+.text-neon {
+  color: var(--neon-primary) !important;
+  text-shadow: 0 0 3px var(--neon-primary-alpha) !important; /* Further reduced intensity */
+}
+
+.text-neon-bright {
+  color: var(--neon-primary) !important;
+  text-shadow: 0 0 6px var(--neon-primary), 0 0 12px var(--neon-primary-alpha) !important; /* Only for headings */
+}
+
+/* Improved Body Text in Neon Mode - Much Better Contrast */
+.neon-mode .body-text,
+.neon-mode p,
+.neon-mode .description,
+.neon-mode .form-label,
+.neon-mode .field-label {
+  color: var(--neon-text-primary) !important; /* Brighter white for better readability */
+  text-shadow: none !important; /* No glow on body text */
+  background: var(--neon-bg-overlay) !important; /* Semi-transparent dark background */
+  padding: 2px 6px !important;
+  border-radius: 4px !important;
+  backdrop-filter: blur(10px) !important;
+}
+
+/* Enhanced Contrast for Form Elements */
+.neon-mode .form-input:not(:focus) {
+  color: var(--neon-text-primary) !important; /* Brighter text when not focused */
+  background: var(--neon-bg-overlay) !important; /* Dark background for contrast */
+  border-color: var(--neon-primary-bright) !important; /* Softer border */
+  box-shadow: 0 0 3px var(--neon-primary-alpha) !important; /* Reduced glow */
+}
+
+.neon-mode .form-input:focus {
+  color: #ffffff !important; /* Pure white when focused */
+  background: rgba(0, 0, 0, 0.9) !important; /* Darker background when focused */
+  border-color: var(--neon-primary) !important;
+  box-shadow: 0 0 8px var(--neon-primary-alpha) !important;
+}
+
+/* Semi-transparent backgrounds for neon overlays */
+.neon-mode .neon-text-overlay {
+  background: var(--neon-bg-overlay) !important;
+  backdrop-filter: blur(15px) !important;
+  border-radius: 8px !important;
+  padding: 12px 16px !important;
+  border: 1px solid var(--neon-primary-alpha) !important;
+}
+
+/* Improved readability for navigation */
+.neon-mode .nav-pills .nav-pill:not(.active) {
+  color: var(--neon-text-secondary) !important; /* Better contrast */
+  background: var(--neon-bg-overlay) !important;
+  border-color: var(--neon-primary-bright) !important;
+}
+
+/* Better contrast for labels and descriptions */
+.neon-mode label,
+.neon-mode .label-text {
+  color: var(--neon-text-primary) !important;
+  text-shadow: none !important;
+  background: var(--neon-bg-overlay) !important;
+  padding: 4px 8px !important;
+  border-radius: 4px !important;
+  display: inline-block !important;
+}
+
+/* Enhanced button contrast in neon mode */
+.neon-mode .btn,
+.neon-mode button {
+  color: #ffffff !important;
+  text-shadow: none !important;
+  border: 2px solid var(--neon-primary) !important;
+}
+
+.neon-mode .btn:hover,
+.neon-mode button:hover {
+  background: var(--neon-primary) !important;
+  color: #000000 !important;
+  text-shadow: none !important;
+}
+
+/* Table and content readability */
+.neon-mode table,
+.neon-mode .preview-box,
+.neon-mode .content-section {
+  background: var(--neon-bg-overlay) !important;
+  border: 1px solid var(--neon-primary-alpha) !important;
+  border-radius: 8px !important;
+  padding: 16px !important;
+  backdrop-filter: blur(15px) !important;
+}
+
+.neon-mode td,
+.neon-mode th,
+.neon-mode .preview-box p {
+  color: var(--neon-text-primary) !important;
+  text-shadow: none !important;
+}
+
+/* Enhanced Navigation Button Visibility */
+.neon-mode .nav-btn {
+  background: var(--neon-bg-overlay) !important;
+  color: var(--neon-text-primary) !important;
+  border: 2px solid var(--neon-primary-alpha) !important;
+  text-shadow: none !important;
+  font-weight: 700 !important;
+  backdrop-filter: blur(10px) !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3) !important;
+}
+
+.neon-mode .nav-btn:hover {
+  background: var(--neon-primary-alpha) !important;
+  color: var(--neon-primary) !important;
+  border-color: var(--neon-primary) !important;
+  box-shadow: 0 4px 15px var(--neon-primary-alpha) !important;
+  text-shadow: 0 0 5px var(--neon-primary-alpha) !important;
+}
+
+.neon-mode .nav-btn.active {
+  background: var(--neon-primary) !important;
+  color: #000000 !important;
+  border-color: var(--neon-primary) !important;
+  box-shadow: 0 0 20px var(--neon-primary-alpha) !important;
+  text-shadow: none !important;
+  font-weight: 800 !important;
 }
 
 /* Purple Theme */

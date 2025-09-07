@@ -3,6 +3,8 @@ import './App-modern.css';
 import './styles/neon-effects.css';
 import Auth from './Auth';
 import LandingHero from './components/LandingHero';
+import { FreePlanLimitWarning } from './components/FreePlanLimitWarning';
+import { ThemeSelector } from './components/ThemeSelector';
 import { NeonThemeProvider, NeonControls } from './contexts/NeonThemeContext';
 import { 
   NeonFloatingParticles, 
@@ -73,6 +75,7 @@ function App() {
   const [planMessage, setPlanMessage] = useState('');
   const [paymentProcessing, setPaymentProcessing] = useState({});
   const [selectedPlanForPayment, setSelectedPlanForPayment] = useState(null); // track which plan is selected for payment
+  const [showFreePlanWarning, setShowFreePlanWarning] = useState(false); // Free plan warning modal
   
   // Update subscription info when usage changes
   const updateSubscriptionInfo = () => {
@@ -341,7 +344,8 @@ function App() {
         // Scroll to first error
         ValidationService.scrollToFirstError(errors);
       } else if (error.message.includes('limit reached')) {
-        setUploadMessage('❌ ' + error.message);
+        // Show free plan warning instead of just text message
+        setShowFreePlanWarning(true);
         AnalyticsService.limitHit('invoice', subscriptionInfo.plan);
       } else {
         console.error('Invoice generation failed:', error);
@@ -380,7 +384,8 @@ function App() {
         // Scroll to first error
         ValidationService.scrollToFirstError(errors);
       } else if (error.message.includes('limit reached')) {
-        setUploadMessage('❌ ' + error.message);
+        // Show free plan warning instead of just text message
+        setShowFreePlanWarning(true);
         AnalyticsService.limitHit('receipt', subscriptionInfo.plan);
       } else {
         console.error('Receipt generation failed:', error);
@@ -496,23 +501,24 @@ function App() {
                 </div>
                 
                 <button
-                  className="upgrade-btn"
+                  className="upgrade-btn enhanced-upgrade"
                   onClick={() => { 
                     AnalyticsService.planUpgradeClick('view_plans', subscriptionInfo.plan); 
                     setShowPlans(!showPlans);
                   }}
-                  style={{
-                    background: '#fff',
-                    color: '#667eea',
-                    border: 'none',
-                    padding: '10px 20px',
-                    borderRadius: '8px',
-                    fontWeight: '600',
-                    cursor: 'pointer',
-                    fontSize: '14px'
-                  }}
                 >
-                  {subscriptionInfo.plan === 'free' ? '💎 Upgrade Plan' : '🛠 Manage Plan'}
+                  {subscriptionInfo.plan === 'free' ? (
+                    <>
+                      <span className="upgrade-icon">💎</span>
+                      <span className="upgrade-text">Upgrade to Pro</span>
+                      <span className="upgrade-price">$9.99/mo</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="upgrade-icon">🛠</span>
+                      <span className="upgrade-text">Manage Plan</span>
+                    </>
+                  )}
                 </button>
               </div>
             </div>
@@ -676,19 +682,11 @@ function App() {
                     </div>
 
                     <div className="form-field">
-                      <label className="field-label" htmlFor="theme">Invoice Theme</label>
-                      <select 
-                        id="theme"
-                        value={selectedTheme} 
-                        onChange={e => setSelectedTheme(e.target.value)} 
-                        className="form-input"
-                      >
-                        {Object.entries(themes).map(([key, theme]) => (
-                          <option key={key} value={key}>
-                            {theme.name}
-                          </option>
-                        ))}
-                      </select>
+                      <ThemeSelector
+                        selectedTheme={selectedTheme}
+                        onThemeChange={setSelectedTheme}
+                        themes={themes}
+                      />
                     </div>
 
                     <div className="form-field">
@@ -1148,19 +1146,11 @@ function App() {
                     </div>
 
                     <div className="form-field">
-                      <label className="field-label" htmlFor="receiptTheme">Receipt Theme</label>
-                      <select
-                        id="receiptTheme"
-                        value={selectedTheme}
-                        onChange={e => setSelectedTheme(e.target.value)}
-                        className="form-input"
-                      >
-                        {Object.entries(themes).map(([key, theme]) => (
-                          <option key={key} value={key}>
-                            {theme.name}
-                          </option>
-                        ))}
-                      </select>
+                      <ThemeSelector
+                        selectedTheme={selectedTheme}
+                        onThemeChange={setSelectedTheme}
+                        themes={themes}
+                      />
                     </div>
 
                     <div className="form-field">
@@ -1396,6 +1386,25 @@ function App() {
             </section>
           </main>
         </>
+      )}
+
+      {/* Free Plan Limit Warning Modal */}
+      {showFreePlanWarning && (
+        <FreePlanLimitWarning
+          currentUsage={{
+            invoice: subscriptionInfo.usage.invoice,
+            receipt: subscriptionInfo.usage.receipt
+          }}
+          limits={{
+            invoice: subscriptionInfo.limits.invoice,
+            receipt: subscriptionInfo.limits.receipt
+          }}
+          planType={subscriptionInfo.plan}
+          onUpgrade={() => {
+            setShowFreePlanWarning(false);
+            setShowPlans(true);
+          }}
+        />
       )}
 
       <footer className="footer">
