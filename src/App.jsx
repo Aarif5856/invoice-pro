@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import './App.css';
+import './App-modern.css';
 import Auth from './Auth';
+import LandingHero from './components/LandingHero';
 import { 
   InvoiceService, 
   ValidationService, 
@@ -396,13 +397,16 @@ function App() {
       </header>
 
       {!isAuthenticated ? (
-        <main className="main-content">
-          <Auth 
-            onAuthChange={setIsAuthenticated} 
-            onUserChange={setUser}
-            isLoggingOut={isLoggingOut} 
-          />
-        </main>
+        <>
+          <LandingHero />
+          <main className="main-content">
+            <Auth 
+              onAuthChange={setIsAuthenticated} 
+              onUserChange={setUser}
+              isLoggingOut={isLoggingOut} 
+            />
+          </main>
+        </>
       ) : (
         <>
           {/* Subscription Plan Status Section */}
