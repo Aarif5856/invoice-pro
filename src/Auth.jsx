@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "./firebase/firebase.js";
+import { useNeonTheme } from "./contexts/NeonThemeContext";
 
 export default function Auth({ onAuthChange, onUserChange, isLoggingOut } = {}) {
   const [email, setEmail] = useState("");
@@ -16,6 +17,9 @@ export default function Auth({ onAuthChange, onUserChange, isLoggingOut } = {}) 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [allowUpdates, setAllowUpdates] = useState(false);
+  
+  // Neon theme hook
+  const { isNeonMode, getNeonButtonClass, getNeonInputClass, getNeonCardClass, getNeonTextClass } = useNeonTheme();
 
   useEffect(() => {
     console.log('Auth component useEffect called, isLoggingOut:', isLoggingOut);
@@ -148,25 +152,25 @@ export default function Auth({ onAuthChange, onUserChange, isLoggingOut } = {}) 
   return (
     <div className="auth-container">
       <div className="auth-overlay">
-        <div className="auth-modal">
+        <div className={getNeonCardClass("auth-modal") + (isNeonMode ? " auth-card-neon" : "")}>
           <div className="auth-header">
-            <h2>{isLogin ? 'Sign in' : 'Sign up free'}</h2>
+            <h2 className={getNeonTextClass("") + (isNeonMode ? " auth-title" : "")}>{isLogin ? 'Sign in' : 'Sign up free'}</h2>
             <button className="close-btn" onClick={() => window.location.reload()}>×</button>
           </div>
 
           {!isLogin && (
             <>
               <div className="signup-options">
-                <p className="signup-label">I am signing up as</p>
+                <p className={getNeonTextClass("signup-label") + (isNeonMode ? " auth-subtitle" : "")}>I am signing up as</p>
                 <div className="option-buttons">
                   <button 
-                    className={`option-btn ${businessType === 'Individual' ? 'active' : ''}`}
+                    className={getNeonButtonClass(`option-btn ${businessType === 'Individual' ? 'active' : ''}`)}
                     onClick={() => setBusinessType('Individual')}
                   >
                     Individual
                   </button>
                   <button 
-                    className={`option-btn ${businessType === 'Company' ? 'active' : ''}`}
+                    className={getNeonButtonClass(`option-btn ${businessType === 'Company' ? 'active' : ''}`)}
                     onClick={() => setBusinessType('Company')}
                   >
                     Company
@@ -248,7 +252,7 @@ export default function Auth({ onAuthChange, onUserChange, isLoggingOut } = {}) 
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="form-input"
+              className={getNeonInputClass("form-input")}
             />
           </div>
 
@@ -260,7 +264,7 @@ export default function Auth({ onAuthChange, onUserChange, isLoggingOut } = {}) 
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="form-input password-input"
+                  className={getNeonInputClass("form-input password-input")}
                 />
                 <button 
                   type="button"
@@ -310,7 +314,7 @@ export default function Auth({ onAuthChange, onUserChange, isLoggingOut } = {}) 
 
           {error && <div className="error-message">{error}</div>}
 
-          <button onClick={handleAuth} className="auth-submit-btn">
+          <button onClick={handleAuth} className={getNeonButtonClass("auth-submit-btn") + (isNeonMode ? " neon-pulse" : "")}>
             {isLogin ? 'Sign In' : 'Create Account'}
           </button>
 

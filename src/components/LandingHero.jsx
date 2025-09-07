@@ -1,6 +1,9 @@
 import React from 'react';
+import { useNeonTheme } from '../contexts/NeonThemeContext';
 
 const LandingHero = () => {
+  const { isNeonMode, getNeonButtonClass, getNeonTextClass } = useNeonTheme();
+  
   return (
     <section className="landing-hero">
       <div className="hero-background">
@@ -9,14 +12,14 @@ const LandingHero = () => {
       </div>
       
       <div className="hero-content">
-        <div className="hero-badge animate-fade-in-up">
+        <div className={`hero-badge animate-fade-in-up ${isNeonMode ? 'neon-border-animate' : ''}`}>
           <span className="badge-icon">✨</span>
           <span>Professional Invoice & Receipt Generator</span>
         </div>
         
-        <h1 className="hero-title animate-fade-in-up">
-          Create Beautiful <span className="title-highlight">Invoices</span> 
-          <br />& <span className="title-highlight">Receipts</span> in Seconds
+        <h1 className={`hero-title animate-fade-in-up ${getNeonTextClass('')}`}>
+          Create Beautiful <span className={`title-highlight ${isNeonMode ? 'text-neon-bright neon-text-flicker' : ''}`}>Invoices</span> 
+          <br />& <span className={`title-highlight ${isNeonMode ? 'text-neon-bright neon-text-flicker' : ''}`}>Receipts</span> in Seconds
         </h1>
         
         <p className="hero-description animate-fade-in-up">

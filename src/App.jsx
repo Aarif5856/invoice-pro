@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import './App-modern.css';
+import './styles/neon-effects.css';
 import Auth from './Auth';
 import LandingHero from './components/LandingHero';
+import { NeonThemeProvider, NeonToggle } from './contexts/NeonThemeContext';
 import { 
   InvoiceService, 
   ValidationService, 
@@ -386,15 +388,17 @@ function App() {
   };
 
   return (
-    <div className="container">
-      <header className="header">
-        <h1>Invoice & Receipt Generator</h1>
-        {isAuthenticated && (
-          <button onClick={handleLogout} className="logout-header-btn">
-            Sign Out
-          </button>
-        )}
-      </header>
+    <NeonThemeProvider>
+      <div className="container">
+        <NeonToggle />
+        <header className="header">
+          <h1>Invoice & Receipt Generator</h1>
+          {isAuthenticated && (
+            <button onClick={handleLogout} className="logout-header-btn">
+              Sign Out
+            </button>
+          )}
+        </header>
 
       {!isAuthenticated ? (
         <>
@@ -1387,6 +1391,7 @@ function App() {
         <p>&copy; 2025 InvoicePro. All rights reserved.</p>
       </footer>
     </div>
+    </NeonThemeProvider>
   );
 }
 

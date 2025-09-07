@@ -1,0 +1,242 @@
+/* Neon Effects System for InvoicePro */
+
+:root {
+  /* Neon Colors */
+  --neon-cyan: #00f7ff;
+  --neon-cyan-alpha: #00f7ff33;
+  --neon-cyan-bright: #00f7ff99;
+  --neon-dark: #0d0d0d;
+  --neon-card: #1a1a1a;
+  
+  /* Neon Shadows */
+  --neon-glow-sm: 0 0 8px var(--neon-cyan-alpha);
+  --neon-glow-md: 0 0 15px var(--neon-cyan), 0 0 30px var(--neon-cyan-alpha);
+  --neon-glow-lg: 0 0 25px var(--neon-cyan), 0 0 50px var(--neon-cyan-bright);
+  --neon-glow-xl: 0 0 35px var(--neon-cyan), 0 0 70px var(--neon-cyan-bright);
+  
+  /* Neon Text Shadow */
+  --neon-text-glow: 0 0 10px var(--neon-cyan);
+  --neon-text-glow-lg: 0 0 20px var(--neon-cyan), 0 0 30px var(--neon-cyan);
+}
+
+/* Neon Button Effects */
+.btn-neon {
+  background: transparent !important;
+  color: var(--neon-cyan) !important;
+  border: 2px solid var(--neon-cyan) !important;
+  box-shadow: var(--neon-glow-sm) !important;
+  text-shadow: var(--neon-text-glow);
+  transition: all 0.3s ease !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-neon::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, var(--neon-cyan-alpha), transparent);
+  transition: left 0.5s;
+}
+
+.btn-neon:hover::before {
+  left: 100%;
+}
+
+.btn-neon:hover {
+  background: var(--neon-cyan) !important;
+  color: var(--neon-dark) !important;
+  box-shadow: var(--neon-glow-lg) !important;
+  text-shadow: none !important;
+  transform: translateY(-2px) !important;
+}
+
+/* Neon Input Effects */
+.form-input-neon {
+  background: transparent !important;
+  border: 2px solid var(--neon-cyan) !important;
+  color: var(--neon-cyan) !important;
+  box-shadow: var(--neon-glow-sm) !important;
+  transition: all 0.3s ease !important;
+}
+
+.form-input-neon::placeholder {
+  color: var(--neon-cyan-bright) !important;
+}
+
+.form-input-neon:focus {
+  box-shadow: var(--neon-glow-md) !important;
+  border-color: var(--neon-cyan) !important;
+}
+
+/* Neon Card Effects */
+.card-neon {
+  background: var(--neon-card) !important;
+  border: 1px solid var(--neon-cyan) !important;
+  box-shadow: var(--neon-glow-md) !important;
+  transition: all 0.3s ease !important;
+}
+
+.card-neon:hover {
+  box-shadow: var(--neon-glow-lg) !important;
+  transform: translateY(-4px) !important;
+}
+
+/* Neon Text Effects */
+.text-neon {
+  color: var(--neon-cyan) !important;
+  text-shadow: var(--neon-text-glow) !important;
+}
+
+.text-neon-bright {
+  color: var(--neon-cyan) !important;
+  text-shadow: var(--neon-text-glow-lg) !important;
+}
+
+/* Neon Theme Toggle */
+.neon-mode {
+  background: var(--neon-dark) !important;
+}
+
+.neon-mode .header {
+  background: var(--neon-card) !important;
+  border-bottom: 1px solid var(--neon-cyan) !important;
+  box-shadow: var(--neon-glow-sm) !important;
+}
+
+.neon-mode .nav {
+  background: var(--neon-card) !important;
+  border: 1px solid var(--neon-cyan) !important;
+  box-shadow: var(--neon-glow-md) !important;
+}
+
+.neon-mode .form-section {
+  background: var(--neon-card) !important;
+  border: 1px solid var(--neon-cyan) !important;
+  box-shadow: var(--neon-glow-md) !important;
+}
+
+.neon-mode .preview-section {
+  background: var(--neon-card) !important;
+  border: 1px solid var(--neon-cyan) !important;
+  box-shadow: var(--neon-glow-md) !important;
+}
+
+/* Neon Loading Animation */
+@keyframes neon-pulse {
+  0%, 100% { 
+    box-shadow: var(--neon-glow-sm);
+  }
+  50% { 
+    box-shadow: var(--neon-glow-lg);
+  }
+}
+
+.neon-pulse {
+  animation: neon-pulse 2s ease-in-out infinite;
+}
+
+/* Neon Border Animation */
+@keyframes neon-border {
+  0% { border-color: var(--neon-cyan); }
+  50% { border-color: var(--primary-400); }
+  100% { border-color: var(--neon-cyan); }
+}
+
+.neon-border-animate {
+  animation: neon-border 3s ease-in-out infinite;
+}
+
+/* Neon Glow Text Animation */
+@keyframes neon-text-flicker {
+  0%, 100% { 
+    text-shadow: var(--neon-text-glow);
+    opacity: 1;
+  }
+  50% { 
+    text-shadow: var(--neon-text-glow-lg);
+    opacity: 0.8;
+  }
+}
+
+.neon-text-flicker {
+  animation: neon-text-flicker 2s ease-in-out infinite;
+}
+
+/* Neon Auth Component */
+.auth-card-neon {
+  background: var(--neon-card) !important;
+  border: 2px solid var(--neon-cyan) !important;
+  box-shadow: var(--neon-glow-lg) !important;
+}
+
+.auth-card-neon .auth-title {
+  color: var(--neon-cyan) !important;
+  text-shadow: var(--neon-text-glow) !important;
+}
+
+.auth-card-neon .auth-subtitle {
+  color: var(--neon-cyan-bright) !important;
+}
+
+/* Neon Payment Cards */
+.plan-card-neon {
+  background: var(--neon-card) !important;
+  border: 2px solid var(--neon-cyan) !important;
+  box-shadow: var(--neon-glow-md) !important;
+}
+
+.plan-card-neon:hover {
+  box-shadow: var(--neon-glow-xl) !important;
+  transform: translateY(-6px) !important;
+}
+
+.plan-card-neon.highlight {
+  border-color: var(--neon-cyan) !important;
+  box-shadow: var(--neon-glow-xl) !important;
+}
+
+/* Neon Toggle Button */
+.neon-toggle {
+  position: fixed;
+  top: var(--space-4);
+  right: var(--space-4);
+  z-index: 1000;
+  background: transparent;
+  border: 2px solid var(--neon-cyan);
+  color: var(--neon-cyan);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  box-shadow: var(--neon-glow-sm);
+}
+
+.neon-toggle:hover {
+  background: var(--neon-cyan);
+  color: var(--neon-dark);
+  box-shadow: var(--neon-glow-md);
+}
+
+/* Responsive Neon Effects */
+@media (max-width: 768px) {
+  .card-neon, .plan-card-neon {
+    box-shadow: var(--neon-glow-sm) !important;
+  }
+  
+  .card-neon:hover, .plan-card-neon:hover {
+    box-shadow: var(--neon-glow-md) !important;
+  }
+  
+  .neon-toggle {
+    top: var(--space-2);
+    right: var(--space-2);
+    padding: var(--space-1) var(--space-2);
+    font-size: var(--text-xs);
+  }
+}
