@@ -3,7 +3,13 @@ import './App-modern.css';
 import './styles/neon-effects.css';
 import Auth from './Auth';
 import LandingHero from './components/LandingHero';
-import { NeonThemeProvider, NeonToggle } from './contexts/NeonThemeContext';
+import { NeonThemeProvider, NeonControls } from './contexts/NeonThemeContext';
+import { 
+  NeonFloatingParticles, 
+  NeonMatrixRain, 
+  NeonBackgroundOrbs, 
+  NeonSoundToggle 
+} from './components/NeonEffects';
 import { 
   InvoiceService, 
   ValidationService, 
@@ -390,7 +396,11 @@ function App() {
   return (
     <NeonThemeProvider>
       <div className="container">
-        <NeonToggle />
+        <NeonControls />
+        <NeonFloatingParticles />
+        <NeonMatrixRain />
+        <NeonBackgroundOrbs />
+        <NeonSoundToggle />
         <header className="header">
           <h1>Invoice & Receipt Generator</h1>
           {isAuthenticated && (

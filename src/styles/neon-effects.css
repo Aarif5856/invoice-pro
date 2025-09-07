@@ -1,25 +1,215 @@
 /* Neon Effects System for InvoicePro */
 
 :root {
-  /* Neon Colors */
+  /* Neon Colors - Cyan Theme */
   --neon-cyan: #00f7ff;
   --neon-cyan-alpha: #00f7ff33;
   --neon-cyan-bright: #00f7ff99;
+  
+  /* Neon Colors - Purple Theme */
+  --neon-purple: #8b5cf6;
+  --neon-purple-alpha: #8b5cf633;
+  --neon-purple-bright: #8b5cf699;
+  
+  /* Neon Colors - Green Theme */
+  --neon-green: #10b981;
+  --neon-green-alpha: #10b98133;
+  --neon-green-bright: #10b98199;
+  
+  /* Neon Colors - Gold Theme */
+  --neon-gold: #f59e0b;
+  --neon-gold-alpha: #f59e0b33;
+  --neon-gold-bright: #f59e0b99;
+  
+  /* Dynamic Neon Color Variables */
+  --neon-primary: var(--neon-cyan);
+  --neon-primary-alpha: var(--neon-cyan-alpha);
+  --neon-primary-bright: var(--neon-cyan-bright);
+  
   --neon-dark: #0d0d0d;
   --neon-card: #1a1a1a;
   
   /* Neon Shadows */
-  --neon-glow-sm: 0 0 8px var(--neon-cyan-alpha);
-  --neon-glow-md: 0 0 15px var(--neon-cyan), 0 0 30px var(--neon-cyan-alpha);
-  --neon-glow-lg: 0 0 25px var(--neon-cyan), 0 0 50px var(--neon-cyan-bright);
-  --neon-glow-xl: 0 0 35px var(--neon-cyan), 0 0 70px var(--neon-cyan-bright);
+  --neon-glow-sm: 0 0 8px var(--neon-primary-alpha);
+  --neon-glow-md: 0 0 15px var(--neon-primary), 0 0 30px var(--neon-primary-alpha);
+  --neon-glow-lg: 0 0 25px var(--neon-primary), 0 0 50px var(--neon-primary-bright);
+  --neon-glow-xl: 0 0 35px var(--neon-primary), 0 0 70px var(--neon-primary-bright);
   
   /* Neon Text Shadow */
-  --neon-text-glow: 0 0 10px var(--neon-cyan);
-  --neon-text-glow-lg: 0 0 20px var(--neon-cyan), 0 0 30px var(--neon-cyan);
+  --neon-text-glow: 0 0 10px var(--neon-primary);
+  --neon-text-glow-lg: 0 0 20px var(--neon-primary), 0 0 30px var(--neon-primary);
 }
 
-/* Neon Button Effects */
+/* Purple Theme */
+.neon-theme-purple {
+  --neon-primary: var(--neon-purple);
+  --neon-primary-alpha: var(--neon-purple-alpha);
+  --neon-primary-bright: var(--neon-purple-bright);
+}
+
+/* Green Theme */
+.neon-theme-green {
+  --neon-primary: var(--neon-green);
+  --neon-primary-alpha: var(--neon-green-alpha);
+  --neon-primary-bright: var(--neon-green-bright);
+}
+
+/* Gold Theme */
+.neon-theme-gold {
+  --neon-primary: var(--neon-gold);
+  --neon-primary-alpha: var(--neon-gold-alpha);
+  --neon-primary-bright: var(--neon-gold-bright);
+}
+
+/* Advanced Floating Particles */
+.neon-floating-particles {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.neon-particle {
+  position: absolute;
+  font-size: 12px;
+  opacity: 0.6;
+  animation: neon-float 15s infinite linear;
+}
+
+.neon-particle:nth-child(1) { left: 10%; animation-delay: 0s; }
+.neon-particle:nth-child(2) { left: 20%; animation-delay: 2s; }
+.neon-particle:nth-child(3) { left: 30%; animation-delay: 4s; }
+.neon-particle:nth-child(4) { left: 40%; animation-delay: 6s; }
+.neon-particle:nth-child(5) { left: 50%; animation-delay: 8s; }
+.neon-particle:nth-child(6) { left: 60%; animation-delay: 10s; }
+.neon-particle:nth-child(7) { left: 70%; animation-delay: 12s; }
+.neon-particle:nth-child(8) { left: 80%; animation-delay: 14s; }
+
+@keyframes neon-float {
+  0% {
+    transform: translateY(100vh) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.6;
+  }
+  90% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(-100px) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+/* Matrix Rain Effect */
+.neon-matrix-rain {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.neon-matrix-column {
+  position: absolute;
+  top: -100%;
+  color: var(--neon-primary);
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  font-weight: bold;
+  text-shadow: 0 0 5px var(--neon-primary);
+  animation: neon-matrix-fall 10s infinite linear;
+  opacity: 0.4;
+}
+
+.neon-matrix-column:nth-child(1) { left: 5%; animation-delay: 0s; }
+.neon-matrix-column:nth-child(2) { left: 15%; animation-delay: 1s; }
+.neon-matrix-column:nth-child(3) { left: 25%; animation-delay: 2s; }
+.neon-matrix-column:nth-child(4) { left: 35%; animation-delay: 3s; }
+.neon-matrix-column:nth-child(5) { left: 45%; animation-delay: 4s; }
+.neon-matrix-column:nth-child(6) { left: 55%; animation-delay: 5s; }
+.neon-matrix-column:nth-child(7) { left: 65%; animation-delay: 6s; }
+.neon-matrix-column:nth-child(8) { left: 75%; animation-delay: 7s; }
+.neon-matrix-column:nth-child(9) { left: 85%; animation-delay: 8s; }
+.neon-matrix-column:nth-child(10) { left: 95%; animation-delay: 9s; }
+
+@keyframes neon-matrix-fall {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.4;
+  }
+  90% {
+    opacity: 0.4;
+  }
+  100% {
+    transform: translateY(100vh);
+    opacity: 0;
+  }
+}
+
+/* Pulsing Background Orbs */
+.neon-background-orbs {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.neon-orb {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--neon-primary-alpha) 0%, transparent 70%);
+  animation: neon-orb-pulse 8s infinite ease-in-out;
+}
+
+.neon-orb:nth-child(1) {
+  width: 200px;
+  height: 200px;
+  top: 10%;
+  left: 10%;
+  animation-delay: 0s;
+}
+
+.neon-orb:nth-child(2) {
+  width: 150px;
+  height: 150px;
+  top: 60%;
+  right: 10%;
+  animation-delay: 2s;
+}
+
+.neon-orb:nth-child(3) {
+  width: 100px;
+  height: 100px;
+  bottom: 20%;
+  left: 50%;
+  animation-delay: 4s;
+}
+
+@keyframes neon-orb-pulse {
+  0%, 100% {
+    opacity: 0.1;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 0.3;
+    transform: scale(1.2);
+  }
+}
 .btn-neon {
   background: transparent !important;
   color: var(--neon-cyan) !important;
@@ -350,7 +540,97 @@
   box-shadow: var(--neon-glow-xl) !important;
 }
 
-/* Neon Toggle Button */
+/* Neon Controls Panel */
+.neon-controls-panel {
+  position: fixed;
+  top: var(--space-4);
+  right: var(--space-4);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.neon-color-toggle {
+  background: transparent;
+  border: 2px solid var(--neon-primary);
+  color: var(--neon-primary);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  box-shadow: var(--neon-glow-sm);
+  position: relative;
+  overflow: hidden;
+}
+
+.neon-color-toggle::before {
+  content: '🌈';
+  position: absolute;
+  top: 50%;
+  left: -25px;
+  transform: translateY(-50%);
+  font-size: 14px;
+  animation: neon-rainbow-slide 4s infinite;
+  z-index: 1;
+}
+
+.neon-color-toggle:hover {
+  background: var(--neon-primary);
+  color: var(--neon-dark);
+  box-shadow: var(--neon-glow-lg);
+  transform: scale(1.05);
+}
+
+.neon-effects-toggles {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.neon-effect-btn {
+  background: transparent;
+  border: 1px solid var(--neon-primary);
+  color: var(--neon-primary);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: var(--text-xs);
+  font-weight: 500;
+  box-shadow: var(--neon-glow-sm);
+  opacity: 0.7;
+}
+
+.neon-effect-btn.active {
+  background: var(--neon-primary);
+  color: var(--neon-dark);
+  opacity: 1;
+  box-shadow: var(--neon-glow-md);
+}
+
+.neon-effect-btn:hover {
+  opacity: 1;
+  transform: scale(1.02);
+  box-shadow: var(--neon-glow-md);
+}
+
+@keyframes neon-rainbow-slide {
+  0% { left: -25px; opacity: 0; }
+  15% { opacity: 0.8; }
+  85% { opacity: 0.8; }
+  100% { left: calc(100% + 10px); opacity: 0; }
+}
+
+/* Sound Toggle Button */
+.neon-sound-toggle:hover {
+  background: var(--neon-primary) !important;
+  color: var(--neon-dark) !important;
+  box-shadow: var(--neon-glow-md) !important;
+  transform: scale(1.05) !important;
+}
 .neon-toggle {
   position: fixed;
   top: var(--space-4);
