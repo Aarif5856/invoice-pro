@@ -1403,10 +1403,14 @@ function PlanCard({ title, accent, priceText, bulletPoints, actionLabel, onSelec
   }, [showPayment, planKey]);
 
   const handlePaymentMethodSelect = async (method) => {
+    console.log('🔥 Payment method selected:', method);
     setSelectedMethod(method);
+    
     try {
       // Get user email from Firebase auth or use a default
       const userEmail = user?.email || 'customer@example.com';
+      console.log('📧 Using email:', userEmail);
+      console.log('💰 Plan data:', { key: planKey, price: planKey === 'pro' ? 9.99 : 19.99 });
       
       const result = await PayoneerService.processPayment(
         method, 
@@ -1414,11 +1418,13 @@ function PlanCard({ title, accent, priceText, bulletPoints, actionLabel, onSelec
         { email: userEmail }
       );
       
-      console.log('Payment processing result:', result);
+      console.log('✅ Payment processing result:', result);
       
       if (result.success) {
+        console.log('📋 Setting payment instructions:', result.instructions);
         setPaymentInstructions(result.instructions);
         setShowInstructions(true);
+        console.log('🎯 Instructions should now be visible');
         
         // Track payment event
         PayoneerService.trackPaymentEvent('payment_method_selected', planKey, method.id);
@@ -1426,7 +1432,7 @@ function PlanCard({ title, accent, priceText, bulletPoints, actionLabel, onSelec
         throw new Error('Payment processing failed');
       }
     } catch (error) {
-      console.error('Payment processing error:', error);
+      console.error('❌ Payment processing error:', error);
       alert(`Error processing payment: ${error.message}. Please try again.`);
     }
   };
@@ -1505,34 +1511,105 @@ function PlanCard({ title, accent, priceText, bulletPoints, actionLabel, onSelec
             </div>
           ) : (
             <div style={{fontSize:12,lineHeight:1.4}}>
-              <h5 style={{margin:'0 0 8px',fontSize:14,fontWeight:600,color:'#1f2735'}}>Payment Instructions:</h5>
-              <div style={{background:'#f8f9fa',padding:12,borderRadius:8,marginBottom:10}}>
-                <strong>Reference ID:</strong> {paymentInstructions?.referenceId}
-              </div>
-              {paymentInstructions?.instructions?.map((instruction, i) => (
-                <div key={i} style={{margin:'4px 0',padding:'4px 0',borderBottom:i < paymentInstructions.instructions.length - 1 ? '1px solid #eee' : 'none'}}>
-                  {instruction}
+              <h5 style={{margin:'0 0 12px',fontSize:14,fontWeight:600,color:'#1f2735',borderBottom:'1px solid #eee',paddingBottom:8}}>
+                {selectedMethod?.name} Payment Instructions
+              </h5>
+              
+              {paymentInstructions?.referenceId && (
+                <div style={{background:'#e8f4ff',padding:12,borderRadius:8,marginBottom:12,border:'1px solid #bee5eb'}}>
+                  <strong style={{color:'#0066cc'}}>Reference ID:</strong> 
+                  <span style={{fontFamily:'monospace',marginLeft:8,color:'#333'}}>{paymentInstructions.referenceId}</span>
+                  <div style={{fontSize:10,color:'#666',marginTop:4}}>Save this reference ID for your records</div>
                 </div>
-              ))}
-              <div style={{marginTop:10,padding:8,background:'#e8f5e8',borderRadius:6,fontSize:11}}>
-                <strong>Activation Time:</strong> {paymentInstructions?.activationTime || 'Within 24 hours'}
+              )}
+
+              {paymentInstructions?.amount && (
+                <div style={{background:'#fff3cd',padding:12,borderRadius:8,marginBottom:12,border:'1px solid #ffeaa7'}}>
+                  <strong style={{color:'#856404'}}>Amount:</strong> 
+                  <span style={{fontSize:16,fontWeight:'bold',marginLeft:8,color:'#856404'}}>
+                    ${paymentInstructions.amount} {paymentInstructions.currency || 'USD'}
+                  </span>
+                </div>
+              )}
+
+              {paymentInstructions?.payoneerEmail && (
+                <div style={{background:'#d4edda',padding:12,borderRadius:8,marginBottom:12,border:'1px solid #c3e6cb'}}>
+                  <strong style={{color:'#155724'}}>Send to:</strong> 
+                  <span style={{fontFamily:'monospace',marginLeft:8,color:'#155724'}}>{paymentInstructions.payoneerEmail}</span>
+                </div>
+              )}
+
+              {paymentInstructions?.instructions && paymentInstructions.instructions.length > 0 && (
+                <div style={{marginBottom:12}}>
+                  <strong style={{display:'block',marginBottom:8,color:'#1f2735'}}>Instructions:</strong>
+                  {paymentInstructions.instructions.map((instruction, i) => (
+                    <div key={i} style={{
+                      margin:'6px 0',
+                      padding:'8px 12px',
+                      background: i === 0 ? '#f8f9fa' : '#ffffff',
+                      border:'1px solid #e9ecef',
+                      borderRadius:6,
+                      fontSize:11
+                    }}>
+                      <span style={{marginRight:8,color:accent}}>•</span>
+                      {instruction}
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {paymentInstructions?.activationTime && (
+                <div style={{marginTop:12,padding:10,background:'#e8f5e8',borderRadius:6,fontSize:11,border:'1px solid #c3e6cb'}}>
+                  <strong style={{color:'#155724'}}>⏱ Activation Time:</strong> 
+                  <span style={{marginLeft:8,color:'#155724'}}>{paymentInstructions.activationTime}</span>
+                </div>
+              )}
+
+              {paymentInstructions?.fees && (
+                <div style={{marginTop:8,padding:10,background:'#fff3cd',borderRadius:6,fontSize:11,border:'1px solid #ffeaa7'}}>
+                  <strong style={{color:'#856404'}}>💰 Fees:</strong> 
+                  <span style={{marginLeft:8,color:'#856404'}}>{paymentInstructions.fees}</span>
+                </div>
+              )}
+
+              <div style={{marginTop:16,display:'flex',gap:8}}>
+                <button
+                  onClick={() => {setShowInstructions(false); setSelectedMethod(null); setPaymentInstructions(null);}}
+                  style={{
+                    flex:1,
+                    background:'#6c757d',
+                    color:'#fff',
+                    border:'none',
+                    padding:'10px',
+                    borderRadius:8,
+                    cursor:'pointer',
+                    fontSize:12,
+                    fontWeight:500
+                  }}
+                >
+                  ← Back
+                </button>
+                <button
+                  onClick={() => {
+                    const instructions = paymentInstructions?.instructions?.join('\n') || '';
+                    const fullText = `Payment Instructions for ${selectedMethod?.name}\n\nReference ID: ${paymentInstructions?.referenceId}\nAmount: $${paymentInstructions?.amount} ${paymentInstructions?.currency || 'USD'}\n\n${instructions}`;
+                    navigator.clipboard.writeText(fullText).then(() => alert('Instructions copied to clipboard!'));
+                  }}
+                  style={{
+                    flex:1,
+                    background:accent,
+                    color:'#fff',
+                    border:'none',
+                    padding:'10px',
+                    borderRadius:8,
+                    cursor:'pointer',
+                    fontSize:12,
+                    fontWeight:500
+                  }}
+                >
+                  📋 Copy
+                </button>
               </div>
-              <button
-                onClick={() => {setShowInstructions(false); setSelectedMethod(null);}}
-                style={{
-                  marginTop:10,
-                  width:'100%',
-                  background:'#6c757d',
-                  color:'#fff',
-                  border:'none',
-                  padding:'8px',
-                  borderRadius:6,
-                  cursor:'pointer',
-                  fontSize:12
-                }}
-              >
-                ← Back to Payment Methods
-              </button>
             </div>
           )}
         </div>

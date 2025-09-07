@@ -189,46 +189,68 @@ class PayoneerService {
 
   // Process payment based on method
   async processPayment(paymentMethod, planData, userInfo) {
-    console.log('PayoneerService.processPayment called with:', {
+    console.log('🚀 PayoneerService.processPayment called with:', {
       paymentMethod,
       planData,
       userInfo
     });
     
     try {
+      let result;
       switch (paymentMethod.id) {
         case 'payoneer_direct':
-          return await this.processPayoneerDirectPayment(planData, userInfo);
+          console.log('📱 Processing Payoneer Direct Payment...');
+          result = await this.processPayoneerDirectPayment(planData, userInfo);
+          break;
         
         case 'payoneer_gps':
-          return await this.processWireTransfer(planData, userInfo);
+          console.log('🏦 Processing Wire Transfer...');
+          result = await this.processWireTransfer(planData, userInfo);
+          break;
         
         case 'qatar_bank_transfer':
-          return await this.processQatarBankTransfer(planData, userInfo);
+          console.log('🇶🇦 Processing Qatar Bank Transfer...');
+          result = await this.processQatarBankTransfer(planData, userInfo);
+          break;
         
         case 'crypto':
-          return await this.processCryptoPayment(planData, userInfo);
+          console.log('₿ Processing Crypto Payment...');
+          result = await this.processCryptoPayment(planData, userInfo);
+          break;
         
         default:
           throw new Error(`Payment method not supported: ${paymentMethod.id}`);
       }
+      
+      console.log('✅ PayoneerService payment result:', result);
+      return result;
     } catch (error) {
-      console.error('Payment processing error in PayoneerService:', error);
+      console.error('❌ Payment processing error in PayoneerService:', error);
       throw error;
     }
   }
 
   // Process Payoneer direct payment
   async processPayoneerDirectPayment(planData, userInfo) {
-    console.log('Processing Payoneer Direct Payment:', { planData, userInfo });
-    const instructions = this.generatePayoneerDirectPaymentInstructions(planData.key, userInfo.email);
-    console.log('Generated instructions:', instructions);
-    return {
-      success: true,
-      method: 'payoneer_direct',
-      instructions,
-      nextStep: 'Show payment instructions to user'
-    };
+    console.log('💳 Processing Payoneer Direct Payment:', { planData, userInfo });
+    
+    try {
+      const instructions = this.generatePayoneerDirectPaymentInstructions(planData.key, userInfo.email);
+      console.log('📋 Generated Payoneer instructions:', instructions);
+      
+      const result = {
+        success: true,
+        method: 'payoneer_direct',
+        instructions,
+        nextStep: 'Show payment instructions to user'
+      };
+      
+      console.log('✅ Payoneer direct payment result:', result);
+      return result;
+    } catch (error) {
+      console.error('❌ Error in processPayoneerDirectPayment:', error);
+      throw error;
+    }
   }
 
   // Process wire transfer via Payoneer GPS
