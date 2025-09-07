@@ -264,15 +264,73 @@
   background: var(--neon-card) !important;
   border: 2px solid var(--neon-cyan) !important;
   box-shadow: var(--neon-glow-lg) !important;
+  animation: neon-card-breathe 6s infinite;
 }
 
 .auth-card-neon .auth-title {
   color: var(--neon-cyan) !important;
   text-shadow: var(--neon-text-glow) !important;
+  animation: neon-title-glow 3s infinite;
 }
 
 .auth-card-neon .auth-subtitle {
   color: var(--neon-cyan-bright) !important;
+}
+
+/* Enhanced Auth Submit Button */
+.neon-mode .auth-submit-btn {
+  position: relative;
+  overflow: hidden;
+}
+
+.neon-mode .auth-submit-btn::before {
+  content: '🚀';
+  position: absolute;
+  top: 50%;
+  left: -30px;
+  transform: translateY(-50%);
+  font-size: 16px;
+  animation: neon-rocket-slide 4s infinite;
+  z-index: 2;
+  opacity: 0.8;
+}
+
+.neon-mode .auth-submit-btn:hover::before {
+  animation: neon-rocket-rapid-slide 1.5s infinite;
+  opacity: 1;
+  font-size: 18px;
+}
+
+@keyframes neon-card-breathe {
+  0%, 100% { 
+    box-shadow: var(--neon-glow-lg);
+  }
+  50% { 
+    box-shadow: var(--neon-glow-xl), 0 0 50px var(--neon-cyan-alpha);
+  }
+}
+
+@keyframes neon-title-glow {
+  0%, 100% { 
+    text-shadow: var(--neon-text-glow);
+  }
+  50% { 
+    text-shadow: var(--neon-text-glow-lg), 0 0 25px var(--neon-cyan);
+  }
+}
+
+@keyframes neon-rocket-slide {
+  0% { left: -30px; opacity: 0; }
+  15% { opacity: 0.8; }
+  85% { opacity: 0.8; }
+  100% { left: calc(100% + 10px); opacity: 0; }
+}
+
+@keyframes neon-rocket-rapid-slide {
+  0% { left: -35px; opacity: 0; transform: translateY(-50%) rotate(-20deg); }
+  20% { opacity: 1; transform: translateY(-50%) rotate(0deg); }
+  80% { opacity: 1; transform: translateY(-50%) rotate(10deg); }
+  100% { left: calc(100% + 15px); opacity: 0; transform: translateY(-50%) rotate(30deg); }
 }
 
 /* Neon Payment Cards */
@@ -309,13 +367,34 @@
   font-weight: 600;
   box-shadow: var(--neon-glow-sm);
   animation: neon-toggle-breathe 4s infinite;
+  position: relative;
+  overflow: hidden;
+}
+
+.neon-toggle::before {
+  content: '⚡';
+  position: absolute;
+  top: 50%;
+  left: -25px;
+  transform: translateY(-50%);
+  font-size: 14px;
+  animation: neon-lightning-slide 5s infinite;
+  z-index: 1;
+  opacity: 0.7;
 }
 
 .neon-toggle:hover {
   background: var(--neon-cyan);
   color: var(--neon-dark);
-  box-shadow: var(--neon-glow-lg);
-  transform: scale(1.1);
+  box-shadow: var(--neon-glow-xl), 0 0 40px var(--neon-cyan);
+  transform: scale(1.15) rotate(5deg);
+  animation: neon-toggle-mega-breathe 1s infinite;
+}
+
+.neon-toggle:hover::before {
+  animation: neon-lightning-rapid-slide 1.5s infinite;
+  opacity: 1;
+  font-size: 16px;
 }
 
 @keyframes neon-toggle-breathe {
@@ -327,6 +406,29 @@
     box-shadow: var(--neon-glow-md);
     border-color: var(--primary-400);
   }
+}
+
+@keyframes neon-toggle-mega-breathe {
+  0%, 100% { 
+    box-shadow: var(--neon-glow-xl), 0 0 40px var(--neon-cyan);
+  }
+  50% { 
+    box-shadow: var(--neon-glow-xl), 0 0 60px var(--neon-cyan), 0 0 80px var(--neon-cyan-bright);
+  }
+}
+
+@keyframes neon-lightning-slide {
+  0% { left: -25px; opacity: 0; }
+  15% { opacity: 0.7; }
+  85% { opacity: 0.7; }
+  100% { left: calc(100% + 10px); opacity: 0; }
+}
+
+@keyframes neon-lightning-rapid-slide {
+  0% { left: -30px; opacity: 0; transform: translateY(-50%) scale(0.8); }
+  20% { opacity: 1; transform: translateY(-50%) scale(1.2); }
+  80% { opacity: 1; transform: translateY(-50%) scale(1); }
+  100% { left: calc(100% + 15px); opacity: 0; transform: translateY(-50%) scale(0.8); }
 }
 
 /* Special Upgrade Button Glow */
@@ -351,11 +453,34 @@
   z-index: 2;
 }
 
+.neon-mode .upgrade-btn::after {
+  content: '✨💎⚡';
+  position: absolute;
+  top: 50%;
+  left: -60px;
+  transform: translateY(-50%);
+  font-size: 14px;
+  animation: neon-diamond-slide 4s infinite 0.5s;
+  z-index: 1;
+  opacity: 0.8;
+}
+
 .neon-mode .upgrade-btn:hover {
   background: var(--neon-cyan) !important;
   color: var(--neon-dark) !important;
-  box-shadow: var(--neon-glow-xl) !important;
-  transform: scale(1.05) !important;
+  box-shadow: var(--neon-glow-xl), 0 0 60px var(--neon-cyan), inset 0 0 20px var(--neon-cyan-alpha) !important;
+  transform: scale(1.08) translateY(-3px) !important;
+  animation: neon-upgrade-mega-pulse 1s infinite !important;
+}
+
+.neon-mode .upgrade-btn:hover::before {
+  animation: neon-diamond-rapid-slide 1.5s infinite;
+  font-size: 18px;
+}
+
+.neon-mode .upgrade-btn:hover::after {
+  animation: neon-diamond-rapid-slide 2s infinite 0.3s;
+  opacity: 1;
 }
 
 @keyframes neon-upgrade-pulse {
@@ -367,11 +492,27 @@
   }
 }
 
+@keyframes neon-upgrade-mega-pulse {
+  0%, 100% { 
+    box-shadow: var(--neon-glow-xl), 0 0 60px var(--neon-cyan), inset 0 0 20px var(--neon-cyan-alpha);
+  }
+  50% { 
+    box-shadow: var(--neon-glow-xl), 0 0 80px var(--neon-cyan), 0 0 100px var(--neon-cyan-bright), inset 0 0 30px var(--neon-cyan-alpha);
+  }
+}
+
 @keyframes neon-diamond-slide {
   0% { left: -30px; opacity: 0; }
   10% { opacity: 1; }
   90% { opacity: 1; }
   100% { left: calc(100% + 10px); opacity: 0; }
+}
+
+@keyframes neon-diamond-rapid-slide {
+  0% { left: -40px; opacity: 0; transform: translateY(-50%) rotate(0deg); }
+  15% { opacity: 1; }
+  85% { opacity: 1; }
+  100% { left: calc(100% + 20px); opacity: 0; transform: translateY(-50%) rotate(360deg); }
 }
 
 /* Responsive Neon Effects */
