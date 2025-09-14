@@ -155,7 +155,6 @@ export default function Auth({ onAuthChange, onUserChange, isLoggingOut } = {}) 
         <div className={getNeonCardClass("auth-modal") + (isNeonMode ? " auth-card-neon" : "")}>
           <div className="auth-header">
             <h2 className={getNeonTextClass("") + (isNeonMode ? " auth-title" : "")}>{isLogin ? 'Sign in' : 'Sign up free'}</h2>
-            <button className="close-btn" onClick={() => window.location.reload()}>×</button>
           </div>
 
           {!isLogin && (
