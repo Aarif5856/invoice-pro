@@ -1,4 +1,5 @@
 import PDFService from './PDFService.js';
+import ProfessionalPDFService from './ProfessionalPDFService.js';
 import ValidationService from './ValidationService.js';
 import StorageService from './StorageService.js';
 import CurrencyService from './CurrencyService.js';
@@ -29,11 +30,11 @@ export class InvoiceService {
         throw new Error('Validation failed');
       }
 
-      // Generate PDF
-      const doc = this.pdfService.generateStyledPDF(
+      // Generate PDF with professional styling
+      const doc = ProfessionalPDFService.generateStyledPDF(
         invoiceData, 
         'invoice', 
-        theme, 
+        'professional', 
         isDraft, 
         this.currencyService.getCurrencies()
       );
@@ -87,11 +88,11 @@ export class InvoiceService {
         throw new Error('Validation failed');
       }
 
-      // Generate PDF
-      const doc = this.pdfService.generateStyledPDF(
+      // Generate PDF with professional styling
+      const doc = ProfessionalPDFService.generateStyledPDF(
         receiptData, 
         'receipt', 
-        theme, 
+        'professional', 
         isDraft, 
         this.currencyService.getCurrencies()
       );

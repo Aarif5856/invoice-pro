@@ -749,6 +749,11 @@ function App() {
                         onChange={e => setReceipt({ ...receipt, clientName: e.target.value })}
                         className="form-input"
                         data-field="clientName"
+                        onFocus={e => {
+                          if (!e.target.value) {
+                            setReceipt({ ...receipt, clientName: 'John Doe' });
+                          }
+                        }}
                       />
                       {hasFieldError('clientName') && (
                         <div className="error-message">{getFieldError('clientName')}</div>
