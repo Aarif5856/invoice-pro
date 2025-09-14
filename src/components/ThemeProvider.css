@@ -1,0 +1,302 @@
+/* Theme Provider Styles */
+.theme-wrapper {
+  min-height: 100vh;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Theme Toggle Button */
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  background: var(--color-muted);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  color: var(--color-foreground);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  box-shadow: var(--shadow-sm);
+}
+
+.theme-toggle:hover {
+  background: var(--color-accent);
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.theme-icon {
+  font-size: var(--text-lg);
+  transition: transform var(--transition-fast);
+}
+
+.theme-toggle:hover .theme-icon {
+  transform: scale(1.1);
+}
+
+.theme-name {
+  font-weight: 600;
+}
+
+/* Theme Variables - Light Theme (Default) */
+:root {
+  --color-background: #ffffff;
+  --color-foreground: #0f172a;
+  --color-primary: #0ea5e9;
+  --color-secondary: #64748b;
+  --color-muted: #f8fafc;
+  --color-accent: #0284c7;
+  --color-border: #e2e8f0;
+  --color-input: #ffffff;
+  --color-card: #ffffff;
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+}
+
+/* Dark Theme Variables */
+[data-theme="dark"] {
+  --color-background: #0f172a;
+  --color-foreground: #f8fafc;
+  --color-primary: #38bdf8;
+  --color-secondary: #94a3b8;
+  --color-muted: #1e293b;
+  --color-accent: #0ea5e9;
+  --color-border: #334155;
+  --color-input: #1e293b;
+  --color-card: #1e293b;
+  --color-success: #34d399;
+  --color-warning: #fbbf24;
+  --color-error: #f87171;
+}
+
+/* Apply theme colors to components */
+.theme-wrapper {
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+}
+
+/* Update existing components to use theme variables */
+.container {
+  background: var(--color-background);
+  color: var(--color-foreground);
+}
+
+.header {
+  background: var(--color-card);
+  border-bottom-color: var(--color-border);
+  color: var(--color-foreground);
+}
+
+.nav {
+  background: var(--color-card);
+  border-color: var(--color-border);
+}
+
+.nav-btn {
+  background: var(--color-card) !important;
+  color: var(--color-foreground) !important;
+  border-color: var(--color-border) !important;
+}
+
+.nav-btn:hover {
+  background: var(--color-muted) !important;
+}
+
+.nav-btn.active {
+  background: var(--color-primary) !important;
+  color: white !important;
+}
+
+.form-section,
+.dashboard-section,
+.stat-card,
+.summary-card,
+.item-card,
+.template-card,
+.action-card,
+.option-card {
+  background: var(--color-card);
+  border-color: var(--color-border);
+  color: var(--color-foreground);
+}
+
+.form-input,
+.filter-select {
+  background: var(--color-input);
+  border-color: var(--color-border);
+  color: var(--color-foreground);
+}
+
+.form-input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+}
+
+.btn-primary {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.btn-secondary {
+  background: var(--color-card);
+  border-color: var(--color-border);
+  color: var(--color-foreground);
+}
+
+.btn-secondary:hover {
+  background: var(--color-muted);
+}
+
+.preview-box {
+  background: var(--color-muted);
+  border-color: var(--color-border);
+}
+
+.footer {
+  background: var(--color-muted);
+  color: var(--color-secondary);
+}
+
+/* Dark theme specific adjustments */
+[data-theme="dark"] .items-section,
+[data-theme="dark"] .advanced-options,
+[data-theme="dark"] .generation-options,
+[data-theme="dark"] .client-templates-section {
+  background: var(--color-muted);
+}
+
+[data-theme="dark"] .logo-upload-container:hover {
+  background: rgba(14, 165, 233, 0.1);
+}
+
+[data-theme="dark"] .subscription-status-banner {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent)) !important;
+}
+
+/* Smooth theme transitions */
+* {
+  transition: background-color 0.3s ease,
+              border-color 0.3s ease,
+              color 0.3s ease,
+              box-shadow 0.3s ease;
+}
+
+/* Scrollbar theming */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-muted);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-secondary);
+}
+
+/* Selection theming */
+::selection {
+  background: var(--color-primary);
+  color: white;
+}
+
+::-moz-selection {
+  background: var(--color-primary);
+  color: white;
+}
+
+/* Focus ring theming */
+.form-input:focus-visible,
+.btn:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Glass morphism effect for cards in dark mode */
+[data-theme="dark"] .stat-card,
+[data-theme="dark"] .dashboard-section,
+[data-theme="dark"] .form-section {
+  backdrop-filter: blur(10px);
+  background: rgba(30, 41, 59, 0.8);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+/* Neon effects for dark theme */
+[data-theme="dark"] .enhanced-upgrade {
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.3) !important;
+}
+
+[data-theme="dark"] .enhanced-upgrade:hover {
+  box-shadow: 0 0 30px rgba(56, 189, 248, 0.5) !important;
+}
+
+/* Chart colors for dark theme */
+[data-theme="dark"] .chart-bar-fill {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+}
+
+[data-theme="dark"] .usage-fill {
+  opacity: 0.9;
+}
+
+/* Loading skeleton for dark theme */
+[data-theme="dark"] .loading {
+  background: var(--color-muted);
+}
+
+[data-theme="dark"] .loading::before {
+  background: linear-gradient(90deg, transparent, rgba(148, 163, 184, 0.1), transparent);
+}
+
+/* Custom properties for better theme integration */
+.theme-light {
+  --shadow-color: rgba(0, 0, 0, 0.1);
+  --shimmer-color: rgba(255, 255, 255, 0.6);
+}
+
+.theme-dark {
+  --shadow-color: rgba(0, 0, 0, 0.3);
+  --shimmer-color: rgba(148, 163, 184, 0.1);
+}
+
+/* Update shadows to use theme-aware colors */
+.theme-wrapper .card,
+.theme-wrapper .btn,
+.theme-wrapper .form-section {
+  box-shadow: 0 4px 6px var(--shadow-color);
+}
+
+.theme-wrapper .card:hover {
+  box-shadow: 0 10px 15px var(--shadow-color);
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .theme-wrapper {
+    --color-border: currentColor;
+  }
+  
+  .form-input,
+  .btn {
+    border-width: 2px;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}

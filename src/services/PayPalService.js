@@ -1,31 +1,30 @@
-// Multi-payment service for Sri Lanka users
-class PaymentService {
+// Enhanced PayPal Payment Service
+class PayPalPaymentService {
   constructor() {
     this.plans = {
       pro: {
-        planId: 'YOUR_ACTUAL_PRO_PLAN_ID',
+        planId: 'P-5ML4271244454362WXNWU5NQ', // Your PayPal plan ID - replace with actual
         price: 9.99,
-        lkrPrice: 3000, // Approximate LKR equivalent
         currency: 'USD',
         interval: 'month'
       },
       business: {
-        planId: 'YOUR_ACTUAL_BUSINESS_PLAN_ID',
+        planId: 'P-1GJ4485785631323WXNWU6FA', // Your PayPal plan ID - replace with actual
         price: 19.99,
-        lkrPrice: 6000, // Approximate LKR equivalent
         currency: 'USD',
         interval: 'month'
       }
     };
 
-    // Sri Lankan bank details for local transfers
-    this.bankDetails = {
-      bankName: 'Commercial Bank of Ceylon',
-      accountName: 'Your Business Name',
-      accountNumber: 'XXXX-XXXX-XXXX-XXXX',
-      branch: 'Colombo Main Branch',
-      swiftCode: 'CCEYLKLX',
-      email: 'payments@invoicepro.tech'
+    // Your PayPal account configuration
+    this.paypalConfig = {
+      clientId: 'Ad_yNvEmPw-oV_nad8eklAh4arhVTFxUIr1z_5KoF5dGPld0BmmbGFESkl1l3SrGEtdldnWDSvqa1anz', // Your PayPal Client ID
+      currency: 'USD',
+      environment: 'sandbox', // Change to 'production' for live payments
+      businessName: 'Invoice Pro',
+      businessEmail: 'your-paypal-email@example.com', // Replace with your actual PayPal email for manual payments
+      returnUrl: `${window.location.origin}/payment-success`,
+      cancelUrl: `${window.location.origin}/payment-cancelled`
     };
   }
 
@@ -36,20 +35,60 @@ class PaymentService {
   }
 
   getAvailablePaymentMethods() {
-    if (this.isRestrictedRegion()) {
-      return [
-        { id: 'bank_transfer', name: 'Bank Transfer (LKR)', recommended: true },
-        { id: 'wise', name: 'Wise (formerly TransferWise)', recommended: false },
-        { id: 'crypto', name: 'Cryptocurrency', recommended: false },
-        { id: 'remitly', name: 'Remitly', recommended: false }
-      ];
-    } else {
-      return [
-        { id: 'paypal', name: 'PayPal', recommended: true },
-        { id: 'stripe', name: 'Credit Card', recommended: true },
-        { id: 'bank_transfer', name: 'Bank Transfer', recommended: false }
-      ];
+    return [
+      { 
+        id: 'paypal', 
+        name: 'PayPal', 
+        recommended: true,
+        description: 'Pay securely with PayPal account or credit card',
+        fees: 'PayPal processing fees apply',
+        icon: '💳'
+      },
+      { 
+        id: 'paypal_direct', 
+        name: 'PayPal Direct Transfer', 
+        recommended: false,
+        description: 'Send money directly to PayPal account',
+        fees: 'Standard PayPal transfer fees',
+        icon: '💰'
+      },
+      { 
+        id: 'bank_transfer', 
+        name: 'Bank Transfer', 
+        recommended: false,
+        description: 'Direct bank wire transfer',
+        fees: 'Bank charges may apply',
+        icon: '🏦'
+      }
+    ];
+  }
+
+  // Generate PayPal direct transfer instructions
+  generatePayPalDirectInstructions(planKey, customerEmail) {
+    const plan = this.plans[planKey];
+    if (!plan) {
+      throw new Error(`Plan ${planKey} not found`);
     }
+
+    const referenceId = `INVPP-${planKey.toUpperCase()}-${Date.now()}`;
+    
+    return {
+      referenceId,
+      amount: plan.price,
+      currency: plan.currency,
+      paypalEmail: this.paypalConfig.businessEmail,
+      instructions: [
+        `Send $${plan.price} USD via PayPal to: ${this.paypalConfig.businessEmail}`,
+        `Payment type: Friends & Family (to avoid fees) or Goods & Services`,
+        `Reference: ${referenceId}`,
+        `Your email: ${customerEmail}`,
+        `Plan: ${planKey.toUpperCase()} subscription`,
+        `After payment, email confirmation to: ${this.paypalConfig.businessEmail}`
+      ],
+      fees: 'PayPal fees may apply depending on payment method',
+      activationTime: 'Usually within 2-4 hours after confirmation',
+      note: 'Please include the reference ID in your PayPal payment note'
+    };
   }
 
   generateBankTransferInstructions(planKey) {
@@ -58,40 +97,124 @@ class PaymentService {
       throw new Error(`Plan ${planKey} not found`);
     }
 
-    const referenceId = `INV-${planKey.toUpperCase()}-${Date.now()}`;
+    const referenceId = `INVBANK-${planKey.toUpperCase()}-${Date.now()}`;
     
     return {
       referenceId,
-      amount: plan.lkrPrice,
-      currency: 'LKR',
-      bankDetails: this.bankDetails,
-      instructions: [
-        `Transfer LKR ${plan.lkrPrice.toLocaleString()} to the account below`,
-        `Reference: ${referenceId}`,
-        `Email payment slip to: ${this.bankDetails.email}`,
-        `Include your account email in the transfer description`,
-        `Account will be activated within 24 hours of payment confirmation`
-      ],
-      note: 'This is a manual process. Please allow 24 hours for activation.'
-    };
-  }
-
-  // Alternative payment methods for Sri Lanka
-  getWisePaymentLink(planKey) {
-    const plan = this.plans[planKey];
-    return `https://wise.com/send?amount=${plan.price}&currency=USD&recipient=your-wise-account`;
-  }
-
-  getCryptoPaymentDetails(planKey) {
-    const plan = this.plans[planKey];
-    return {
-      btcAddress: 'bc1qYourBitcoinAddress',
-      ethAddress: '0xYourEthereumAddress', 
-      usdtAddress: 'YourUSDTTRC20Address',
       amount: plan.price,
       currency: 'USD',
-      note: 'Send payment confirmation screenshot to payments@invoicepro.tech'
+      instructions: [
+        `Wire transfer $${plan.price} USD to our business account`,
+        `Reference: ${referenceId}`,
+        `Contact support for bank details: ${this.paypalConfig.businessEmail}`,
+        `Include reference ID in transfer description`,
+        `Account will be activated within 24-48 hours`
+      ],
+      fees: 'Bank wire transfer fees apply',
+      activationTime: '24-48 hours after payment confirmation',
+      note: 'Contact support for detailed bank information'
     };
+  }
+
+  // Process payment based on method
+  async processPayment(paymentMethod, planData, userInfo) {
+    console.log('🚀 PayPalService.processPayment called with:', {
+      paymentMethod,
+      planData,
+      userInfo
+    });
+    
+    try {
+      let result;
+      switch (paymentMethod.id) {
+        case 'paypal':
+          console.log('💳 Processing PayPal Subscription...');
+          result = await this.processPayPalSubscription(planData, userInfo);
+          break;
+        
+        case 'paypal_direct':
+          console.log('💰 Processing PayPal Direct Transfer...');
+          result = await this.processPayPalDirect(planData, userInfo);
+          break;
+        
+        case 'bank_transfer':
+          console.log('🏦 Processing Bank Transfer...');
+          result = await this.processBankTransfer(planData, userInfo);
+          break;
+        
+        default:
+          throw new Error(`Payment method not supported: ${paymentMethod.id}`);
+      }
+      
+      console.log('✅ PayPalService payment result:', result);
+      return result;
+    } catch (error) {
+      console.error('❌ Payment processing error in PayPalService:', error);
+      throw error;
+    }
+  }
+
+  // Process PayPal direct transfer
+  async processPayPalDirect(planData, userInfo) {
+    console.log('💰 Processing PayPal Direct Transfer:', { planData, userInfo });
+    
+    try {
+      const instructions = this.generatePayPalDirectInstructions(planData.key, userInfo.email);
+      console.log('📋 Generated PayPal instructions:', instructions);
+      
+      const result = {
+        success: true,
+        method: 'paypal_direct',
+        instructions,
+        nextStep: 'Show payment instructions to user'
+      };
+      
+      console.log('✅ PayPal direct payment result:', result);
+      return result;
+    } catch (error) {
+      console.error('❌ Error in processPayPalDirect:', error);
+      throw error;
+    }
+  }
+
+  // Process bank transfer
+  async processBankTransfer(planData, userInfo) {
+    const instructions = this.generateBankTransferInstructions(planData.key);
+    return {
+      success: true,
+      method: 'bank_transfer',
+      instructions,
+      nextStep: 'Show bank transfer instructions to user'
+    };
+  }
+
+  // Process PayPal subscription (integrated button)
+  async processPayPalSubscription(planData, userInfo) {
+    console.log('💳 Processing PayPal Subscription:', { planData, userInfo });
+    
+    try {
+      // For PayPal subscription, we return configuration for the PayPal button
+      const result = {
+        success: true,
+        method: 'paypal',
+        requiresPayPalButton: true,
+        planKey: planData.key,
+        instructions: {
+          title: 'PayPal Subscription',
+          description: 'Complete your subscription with PayPal',
+          amount: planData.price || this.plans[planData.key]?.price,
+          currency: 'USD',
+          note: 'You will be redirected to PayPal to complete the subscription'
+        },
+        nextStep: 'Render PayPal subscription button'
+      };
+      
+      console.log('✅ PayPal subscription setup result:', result);
+      return result;
+    } catch (error) {
+      console.error('❌ Error in processPayPalSubscription:', error);
+      throw error;
+    }
   }
 
   // For regions where PayPal works
@@ -234,4 +357,4 @@ class PaymentService {
   }
 }
 
-export default new PaymentService();
+export default new PayPalPaymentService();

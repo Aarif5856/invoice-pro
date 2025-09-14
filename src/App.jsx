@@ -1,10 +1,15 @@
 import React, { useState } from 'react';
 import './App-modern.css';
 import './styles/neon-effects.css';
+import './styles/accessibility.css';
 import Auth from './Auth';
 import LandingHero from './components/LandingHero';
+import Dashboard from './components/Dashboard';
+import EnhancedInvoiceForm from './components/EnhancedInvoiceForm';
 import { FreePlanLimitWarning } from './components/FreePlanLimitWarning';
 import { ThemeSelector } from './components/ThemeSelector';
+import { ThemeProvider, ThemeToggle } from './components/ThemeProvider';
+import { AccessibilityProvider, AccessibilityPanel } from './components/AccessibilityProvider';
 import { NeonThemeProvider, NeonControls } from './contexts/NeonThemeContext';
 import { 
   NeonFloatingParticles, 
@@ -19,7 +24,7 @@ import {
   CurrencyService,
   FirebaseService,
   AnalyticsService,
-  PayoneerService
+  PayPalService
 } from './services';
 import { SubscriptionService } from './services/SubscriptionService';
 
@@ -34,7 +39,7 @@ const initialInvoice = InvoiceService.createInitialInvoice();
 const initialReceipt = InvoiceService.createInitialReceipt();
 
 function App() {
-  const [formType, setFormType] = useState('invoice');
+  const [formType, setFormType] = useState('dashboard');
   const [invoice, setInvoice] = useState(initialInvoice);
   const [receipt, setReceipt] = useState(initialReceipt);
   const [isAuthenticated, setIsAuthenticated] = useState(false); // Start with false, require manual login
@@ -113,20 +118,20 @@ function App() {
     setPlanMessage(`🎉 Successfully upgraded to ${plan.toUpperCase()} plan! Welcome to unlimited features.`);
     setPaymentProcessing(prev => ({ ...prev, [plan]: false }));
     setSelectedPlanForPayment(null); // Reset payment selection
-    PayoneerService.trackPaymentEvent('success', plan);
+    PayPalService.trackPaymentEvent('success', plan);
   };
 
   const handlePaymentError = (plan, error) => {
     setPlanMessage(`❌ Payment failed for ${plan.toUpperCase()} plan. Please try again.`);
     setPaymentProcessing(prev => ({ ...prev, [plan]: false }));
-    PayoneerService.trackPaymentEvent('error', plan, error);
+    PayPalService.trackPaymentEvent('error', plan, error);
   };
 
   const handlePaymentCancel = (plan) => {
     setPlanMessage(`Payment cancelled for ${plan.toUpperCase()} plan.`);
     setPaymentProcessing(prev => ({ ...prev, [plan]: false }));
     setSelectedPlanForPayment(null); // Reset payment selection
-    PayoneerService.trackPaymentEvent('cancel', plan);
+    PayPalService.trackPaymentEvent('cancel', plan);
   };  // Validation functions delegated to ValidationService
   const validateInvoice = (invoiceData) => ValidationService.validateInvoice(invoiceData);
   const validateReceipt = (receiptData) => ValidationService.validateReceipt(receiptData);
@@ -399,8 +404,10 @@ function App() {
   };
 
   return (
-    <NeonThemeProvider>
-      <div className="container">
+    <ThemeProvider>
+      <AccessibilityProvider>
+        <NeonThemeProvider>
+          <div className="container">
         <NeonControls />
         <NeonFloatingParticles />
         <NeonMatrixRain />
@@ -408,11 +415,14 @@ function App() {
         <NeonSoundToggle />
         <header className="header">
           <h1>Invoice & Receipt Generator</h1>
-          {isAuthenticated && (
-            <button onClick={handleLogout} className="logout-header-btn">
-              Sign Out
-            </button>
-          )}
+          <div className="header-actions">
+            <ThemeToggle />
+            {isAuthenticated && (
+              <button onClick={handleLogout} className="logout-header-btn">
+                Sign Out
+              </button>
+            )}
+          </div>
         </header>
 
       {!isAuthenticated ? (
@@ -619,8 +629,15 @@ function App() {
           )}
 
           <nav className="nav">
-            <button className={`nav-btn${formType === 'invoice' ? ' active' : ''}`} onClick={() => setFormType('invoice')}>Create Invoice</button>
-            <button className={`nav-btn${formType === 'receipt' ? ' active' : ''}`} onClick={() => setFormType('receipt')}>Create Receipt</button>
+            <button className={`nav-btn${formType === 'dashboard' ? ' active' : ''}`} onClick={() => setFormType('dashboard')}>
+              📊 Dashboard
+            </button>
+            <button className={`nav-btn${formType === 'invoice' ? ' active' : ''}`} onClick={() => setFormType('invoice')}>
+              📄 Create Invoice
+            </button>
+            <button className={`nav-btn${formType === 'receipt' ? ' active' : ''}`} onClick={() => setFormType('receipt')}>
+              🧾 Create Receipt
+            </button>
             <button className={`nav-btn${formType === 'drafts' ? ' active' : ''}`} onClick={() => setFormType('drafts')}>
               💾 Drafts ({savedDrafts.length})
             </button>
@@ -629,475 +646,32 @@ function App() {
             </button>
           </nav>
 
-          <main className="main-content">
+          <main className="main-content" id="main-content" tabIndex="-1">
+            {formType === 'dashboard' ? (
+              <Dashboard 
+                subscriptionInfo={subscriptionInfo} 
+                onNavigate={setFormType}
+              />
+            ) : (
             <section className="form-section">
               {formType === 'invoice' ? (
-                <>
-                  <h2>Create Invoice</h2>
-                  
-                  {/* Invoice form without problematic submit button */}
-                  <div>
-                    <div className={`form-field ${hasFieldError('businessName') ? 'has-error' : ''}`}>
-                      <label className="field-label required" htmlFor="businessName">Business Name</label>
-                      <input 
-                        type="text" 
-                        id="businessName"
-                        placeholder="Enter your business name" 
-                        value={invoice.businessName} 
-                        onChange={e => setInvoice({ ...invoice, businessName: e.target.value })} 
-                        className="form-input"
-                        data-field="businessName"
-                      />
-                      {hasFieldError('businessName') && (
-                        <div className="error-message">{getFieldError('businessName')}</div>
-                      )}
-                    </div>
-                    
-                    <div className="form-field">
-                      <label className="field-label" htmlFor="businessContact">Business Contact Info</label>
-                      <input 
-                        type="text" 
-                        id="businessContact"
-                        placeholder="Email, phone, address" 
-                        value={invoice.businessContact} 
-                        onChange={e => setInvoice({ ...invoice, businessContact: e.target.value })} 
-                        className="form-input"
-                      />
-                    </div>
-
-                    <div className="form-field">
-                      <label className="field-label" htmlFor="currency">Currency</label>
-                      <select 
-                        id="currency"
-                        value={invoice.currency} 
-                        onChange={e => setInvoice({ ...invoice, currency: e.target.value })} 
-                        className="form-input"
-                      >
-                        {currencies.map(currency => (
-                          <option key={currency.code} value={currency.code}>
-                            {currency.symbol} {currency.code} - {currency.name}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div className="form-field">
-                      <ThemeSelector
-                        selectedTheme={selectedTheme}
-                        onThemeChange={setSelectedTheme}
-                        themes={themes}
-                      />
-                    </div>
-
-                    <div className="form-field">
-                      <label className="field-label">
-                        <input
-                          type="checkbox"
-                          checked={isDraftMode}
-                          onChange={e => setIsDraftMode(e.target.checked)}
-                          className="draft-checkbox"
-                        />
-                        📝 Generate as Draft (adds watermark)
-                      </label>
-                    </div>
-
-                    <div className="logo-upload-section">
-                      <label className="logo-upload-label">Business Logo</label>
-                      <div className="logo-upload-container">
-                        {invoice.businessLogo ? (
-                          <div className="logo-preview">
-                            <img src={invoice.businessLogo} alt="Business Logo" className="logo-preview-image" />
-                            <div className="logo-actions">
-                              <button
-                                type="button"
-                                className="change-logo-btn"
-                                onClick={() => document.getElementById('logo-input-invoice').click()}
-                              >
-                                📷 Change Logo
-                              </button>
-                              <button
-                                type="button"
-                                className="remove-logo-btn"
-                                onClick={() => setInvoice({ ...invoice, businessLogo: '' })}
-                              >
-                                🗑️ Remove
-                              </button>
-                            </div>
-                          </div>
-                        ) : (
-                          <div
-                            className="logo-upload-area"
-                            onClick={() => document.getElementById('logo-input-invoice').click()}
-                          >
-                            <div className="logo-upload-icon">🏢</div>
-                            <div className="logo-upload-text">
-                              <strong>Upload Business Logo</strong>
-                              <p>Tap to select an image file</p>
-                            </div>
-                          </div>
-                        )}
-                        <input
-                          id="logo-input-invoice"
-                          type="file"
-                          accept="image/*"
-                          onChange={e => {
-                            const file = e.target.files?.[0];
-                            if (file) {
-                              const reader = new FileReader();
-                              reader.onload = ev => setInvoice({ ...invoice, businessLogo: ev.target.result });
-                              reader.readAsDataURL(file);
-                            }
-                          }}
-                          style={{ display: 'none' }}
-                        />
-                      </div>
-                    </div>
-
-                    <div className={`form-field ${hasFieldError('invoiceNumber') ? 'has-error' : ''}`}>
-                      <label className="field-label required" htmlFor="invoiceNumber">Invoice Number</label>
-                      <div className="number-generator">
-                        <input
-                          type="text"
-                          id="invoiceNumber"
-                          placeholder="Enter invoice number"
-                          value={invoice.invoiceNumber}
-                          onChange={e => setInvoice({ ...invoice, invoiceNumber: e.target.value })}
-                          className="form-input"
-                          data-field="invoiceNumber"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setInvoice({ ...invoice, invoiceNumber: generateInvoiceNumber() })}
-                          className="add-btn"
-                          title="Generate New Invoice Number"
-                        >
-                          🔄
-                        </button>
-                      </div>
-                      {hasFieldError('invoiceNumber') && (
-                        <div className="error-message">{getFieldError('invoiceNumber')}</div>
-                      )}
-                    </div>
-
-                    <div className={`form-field ${hasFieldError('date') ? 'has-error' : ''}`}>
-                      <label className="field-label required" htmlFor="date">Invoice Date</label>
-                      <input
-                        type="date"
-                        id="date"
-                        placeholder="Invoice Date"
-                        value={invoice.date}
-                        onChange={e => setInvoice({ ...invoice, date: e.target.value })}
-                        className="form-input"
-                        title="Invoice Date"
-                        data-field="date"
-                      />
-                      {hasFieldError('date') && (
-                        <div className="error-message">{getFieldError('date')}</div>
-                      )}
-                    </div>
-
-                    <div className="form-field">
-                      <label className="field-label" htmlFor="dueDate">Due Date</label>
-                      <input
-                        type="date"
-                        id="dueDate"
-                        placeholder="Due Date"
-                        value={invoice.dueDate}
-                        onChange={e => setInvoice({ ...invoice, dueDate: e.target.value })}
-                        className="form-input"
-                        title="Due Date"
-                      />
-                    </div>
-
-                    <div className={`form-field ${hasFieldError('clientName') ? 'has-error' : ''}`}>
-                      <label className="field-label required" htmlFor="clientName">Client Name</label>
-                      <input
-                        type="text"
-                        id="clientName"
-                        placeholder="Enter client name"
-                        value={invoice.clientName}
-                        onChange={e => setInvoice({ ...invoice, clientName: e.target.value })}
-                        className="form-input"
-                        data-field="clientName"
-                      />
-                      {hasFieldError('clientName') && (
-                        <div className="error-message">{getFieldError('clientName')}</div>
-                      )}
-                    </div>
-
-                    <div className="form-field">
-                      <label className="field-label" htmlFor="clientDetails">Client Details</label>
-                      <textarea
-                        id="clientDetails"
-                        placeholder="Client address, phone, email, etc."
-                        value={invoice.clientDetails}
-                        onChange={e => setInvoice({ ...invoice, clientDetails: e.target.value })}
-                        className="form-input"
-                      />
-                    </div>
-
-                    {/* Items Section */}
-                    <div className="items-section">
-                      <label className="field-label required">Items</label>
-                      {invoice.items.map((item, idx) => (
-                        <div key={idx} className="item-row">
-                          <div className={`form-group ${hasFieldError(`item_${idx}_description`) ? 'has-error' : ''}`}>
-                            <label className="field-label required">Description</label>
-                            <input
-                              type="text"
-                              placeholder="Description"
-                              value={item.description}
-                              onChange={e => {
-                                const items = [...invoice.items];
-                                items[idx].description = e.target.value;
-                                setInvoice({ ...invoice, items });
-                              }}
-                              className="form-input"
-                              data-field={`item_${idx}_description`}
-                            />
-                            {hasFieldError(`item_${idx}_description`) && (
-                              <div className="error-message">{getFieldError(`item_${idx}_description`)}</div>
-                            )}
-                          </div>
-
-                          <div className={`form-group ${hasFieldError(`item_${idx}_quantity`) ? 'has-error' : ''}`}>
-                            <label className="field-label required">Quantity</label>
-                            <input
-                              type="number"
-                              min="1"
-                              placeholder="Qty"
-                              value={item.quantity === 0 ? '' : item.quantity}
-                              onChange={e => {
-                                const v = e.target.value;
-                                const items = [...invoice.items];
-                                items[idx].quantity = v === '' ? 0 : Number(v);
-                                if (items[idx].quantity === 0) {
-                                  items[idx].quantity = 1;
-                                }
-                                setInvoice({ ...invoice, items });
-                              }}
-                              className="form-input small"
-                              data-field={`item_${idx}_quantity`}
-                            />
-                            {hasFieldError(`item_${idx}_quantity`) && (
-                              <div className="error-message">{getFieldError(`item_${idx}_quantity`)}</div>
-                            )}
-                          </div>
-
-                          <div className={`form-group ${hasFieldError(`item_${idx}_price`) ? 'has-error' : ''}`}>
-                            <label className="field-label required">Price</label>
-                            <input
-                              type="number"
-                              min="0.01"
-                              step="0.01"
-                              placeholder="Price"
-                              value={item.price === 0 ? '' : item.price}
-                              onChange={e => {
-                                const v = e.target.value;
-                                const items = [...invoice.items];
-                                items[idx].price = v === '' ? 0 : Number(v);
-                                setInvoice({ ...invoice, items });
-                              }}
-                              className="form-input small"
-                              data-field={`item_${idx}_price`}
-                            />
-                            {hasFieldError(`item_${idx}_price`) && (
-                              <div className="error-message">{getFieldError(`item_${idx}_price`)}</div>
-                            )}
-                          </div>
-
-                          <button type="button" className="remove-btn" onClick={() => {
-                            const items = invoice.items.filter((_, i) => i !== idx);
-                            setInvoice({ ...invoice, items });
-                          }}>Remove</button>
-                        </div>
-                      ))}
-                      <button type="button" className="add-btn" onClick={() => setInvoice({ ...invoice, items: [...invoice.items, { description: '', quantity: 1, price: 0 }] })}>Add Item</button>
-                    </div>
-
-                    <div className={`form-field ${hasFieldError('tax') ? 'has-error' : ''}`}>
-                      <label className="field-label" htmlFor="tax">Tax (%)</label>
-                      <input
-                        type="number"
-                        id="tax"
-                        min="0"
-                        max="100"
-                        step="0.01"
-                        placeholder="Enter tax percentage"
-                        value={invoice.tax === '' ? '' : invoice.tax}
-                        onChange={e => {
-                          const v = e.target.value;
-                          setInvoice({ ...invoice, tax: v === '' ? '' : Number(v) });
-                        }}
-                        className="form-input"
-                        data-field="tax"
-                      />
-                      {hasFieldError('tax') && (
-                        <div className="error-message">{getFieldError('tax')}</div>
-                      )}
-                    </div>
-
-                    <div className={`form-field ${hasFieldError('discount') ? 'has-error' : ''}`}>
-                      <label className="field-label" htmlFor="discount">Discount (%)</label>
-                      <input
-                        type="number"
-                        id="discount"
-                        min="0"
-                        max="100"
-                        step="0.01"
-                        placeholder="Enter discount percentage"
-                        value={invoice.discount === '' ? '' : invoice.discount}
-                        onChange={e => {
-                          const v = e.target.value;
-                          setInvoice({ ...invoice, discount: v === '' ? '' : Number(v) });
-                        }}
-                        className="form-input"
-                        data-field="discount"
-                      />
-                      {hasFieldError('discount') && (
-                        <div className="error-message">{getFieldError('discount')}</div>
-                      )}
-                    </div>
-
-                    <div className="form-field">
-                      <label className="field-label" htmlFor="paymentTerms">Payment Terms</label>
-                      <textarea
-                        id="paymentTerms"
-                        placeholder="e.g., Net 30, Due on receipt, 2/10 Net 30"
-                        value={invoice.paymentTerms}
-                        onChange={e => setInvoice({ ...invoice, paymentTerms: e.target.value })}
-                        className="form-input"
-                        rows="2"
-                      />
-                    </div>
-
-                    <div className="form-field">
-                      <label className="field-label" htmlFor="notes">Notes</label>
-                      <textarea
-                        id="notes"
-                        placeholder="Additional notes or terms"
-                        value={invoice.notes}
-                        onChange={e => setInvoice({ ...invoice, notes: e.target.value })}
-                        className="form-input"
-                      />
-                    </div>
-
-                    {/* Action buttons - removed problematic submit button */}
-                    <div className="form-actions">
-                      <button
-                        type="button"
-                        onClick={() => saveDraft(invoice, 'invoice')}
-                        className="draft-btn"
-                      >
-                        💾 Save Draft
-                      </button>
-                      
-                      <button
-                        type="button"
-                        onClick={() => setShowExportOptions(!showExportOptions)}
-                        className="export-btn"
-                      >
-                        📤 Export Options
-                      </button>
-                    </div>
-
-                    {showExportOptions && (
-                      <div className="export-options">
-                        <h4>Export Options</h4>
-                        <div className="export-buttons">
-                          <button
-                            type="button"
-                            onClick={() => emailInvoice(invoice, 'invoice')}
-                            className="export-option-btn"
-                          >
-                            📧 Email Invoice
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => generateShareableLink(invoice, 'invoice')}
-                            className="export-option-btn"
-                          >
-                            🔗 Generate Link
-                          </button>
-                          {shareableLink && (
-                            <button
-                              type="button"
-                              onClick={copyShareableLink}
-                              className="export-option-btn"
-                            >
-                              📋 Copy Link
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="preview-section">
-                    <h3>Invoice Preview</h3>
-                    <div className="preview-box">
-                      <div className="preview-logo-section">
-                        {invoice.businessLogo ? (
-                          <img
-                            src={invoice.businessLogo}
-                            alt="Business Logo"
-                            className="preview-logo"
-                          />
-                        ) : (
-                          <div className="preview-logo-placeholder">
-                            🏢 No Logo Uploaded
-                          </div>
-                        )}
-                      </div>
-                      <p><strong>{invoice.businessName}</strong></p>
-                      <p>{invoice.businessContact}</p>
-                      <hr />
-                      <p><strong>Invoice Number:</strong> {invoice.invoiceNumber}</p>
-                      <p><strong>Date:</strong> {invoice.date}</p>
-                      {invoice.dueDate && <p><strong>Due Date:</strong> {invoice.dueDate}</p>}
-                      <p><strong>Client:</strong> {invoice.clientName}</p>
-                      <p>{invoice.clientDetails}</p>
-
-                      <table className="preview-table">
-                        <thead>
-                          <tr><th>Description</th><th>Qty</th><th>Price</th><th>Total</th></tr>
-                        </thead>
-                        <tbody>
-                          {invoice.items.map((item, idx) => (
-                            <tr key={idx}><td>{item.description}</td><td>{item.quantity}</td><td>${(item.price || 0).toFixed(2)}</td><td>${((item.quantity || 0) * (item.price || 0)).toFixed(2)}</td></tr>
-                          ))}
-                        </tbody>
-                      </table>
-
-                      <p><strong>Subtotal:</strong> ${subtotal(invoice.items).toFixed(2)}</p>
-                      <p><strong>Tax ({invoice.tax}%):</strong> ${(subtotal(invoice.items) * (invoice.tax || 0) / 100).toFixed(2)}</p>
-                      <p><strong>Discount ({invoice.discount}%):</strong> -${(subtotal(invoice.items) * (invoice.discount || 0) / 100).toFixed(2)}</p>
-                      <p><strong>Grand Total:</strong> ${(subtotal(invoice.items) + subtotal(invoice.items) * (invoice.tax || 0) / 100 - subtotal(invoice.items) * (invoice.discount || 0) / 100).toFixed(2)}</p>
-                      <p><strong>Notes:</strong> {invoice.notes}</p>
-                    </div>
-                  </div>
-                  
-                  {/* Working Export & Save PDF Button */}
-                  <div style={{ marginTop: 12 }}>
-                    <button
-                      type="button"
-                      className="export-btn"
-                      tabIndex={0}
-                      disabled={uploading || (subscriptionInfo.plan === 'free' && subscriptionInfo.usage.invoice >= subscriptionInfo.limits.invoice)}
-                      onClick={generateAndUploadInvoice}
-                      onKeyDown={e => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault();
-                          generateAndUploadInvoice();
-                        }
-                      }}
-                    >Export & Save PDF</button>
-                    {uploadMessage && <div style={{ marginTop: 8, fontSize: 13 }}>{uploadMessage}</div>}
-                  </div>
-                </>
+                <EnhancedInvoiceForm
+                  invoice={invoice}
+                  setInvoice={setInvoice}
+                  onGenerate={(theme, isDraft) => {
+                    setSelectedTheme(theme);
+                    setIsDraftMode(isDraft);
+                    generateAndUploadInvoice();
+                  }}
+                  validationErrors={validationErrors}
+                  hasFieldError={hasFieldError}
+                  getFieldError={getFieldError}
+                  subscriptionInfo={subscriptionInfo}
+                />
               ) : formType === 'receipt' ? (
                 <>
                   <h2>Create Receipt</h2>
+                  
                   
                   {/* Receipt form without problematic submit button */}
                   <div>
@@ -1384,6 +958,7 @@ function App() {
                 </>
               ) : null}
             </section>
+            )}
           </main>
         </>
       )}
@@ -1410,8 +985,12 @@ function App() {
       <footer className="footer">
         <p>&copy; 2025 InvoicePro. All rights reserved.</p>
       </footer>
-    </div>
-    </NeonThemeProvider>
+      
+      <AccessibilityPanel />
+        </div>
+      </NeonThemeProvider>
+    </AccessibilityProvider>
+  </ThemeProvider>
   );
 }
 
@@ -1426,7 +1005,7 @@ function PlanCard({ title, accent, priceText, bulletPoints, actionLabel, onSelec
   
   React.useEffect(() => {
     if (showPayment && planKey !== 'free') {
-      const methods = PayoneerService.getAvailablePaymentMethods();
+      const methods = PayPalService.getAvailablePaymentMethods();
       setPaymentMethods(methods);
     }
   }, [showPayment, planKey]);
@@ -1441,7 +1020,7 @@ function PlanCard({ title, accent, priceText, bulletPoints, actionLabel, onSelec
       console.log('📧 Using email:', userEmail);
       console.log('💰 Plan data:', { key: planKey, price: planKey === 'pro' ? 9.99 : 19.99 });
       
-      const result = await PayoneerService.processPayment(
+      const result = await PayPalService.processPayment(
         method, 
         { key: planKey, price: planKey === 'pro' ? 9.99 : 19.99 },
         { email: userEmail }
@@ -1455,8 +1034,40 @@ function PlanCard({ title, accent, priceText, bulletPoints, actionLabel, onSelec
         setShowInstructions(true);
         console.log('🎯 Instructions should now be visible');
         
+        // If this is a PayPal subscription, render the PayPal button
+        if (result.requiresPayPalButton && window.paypal) {
+          setTimeout(() => {
+            const buttonContainer = document.getElementById(`paypal-button-${planKey}`);
+            if (buttonContainer) {
+              PayPalService.renderPayPalButton(
+                `paypal-button-${planKey}`,
+                planKey,
+                (subscriptionInfo) => {
+                  console.log('PayPal payment successful:', subscriptionInfo);
+                  alert('🎉 Payment successful! Your account has been upgraded.');
+                  // Update user plan
+                  const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+                  userData.plan = planKey;
+                  userData.subscription = subscriptionInfo;
+                  localStorage.setItem('userData', JSON.stringify(userData));
+                  // Reload page to reflect changes
+                  window.location.reload();
+                },
+                (error) => {
+                  console.error('PayPal payment error:', error);
+                  alert('❌ Payment failed. Please try again.');
+                },
+                () => {
+                  console.log('PayPal payment cancelled');
+                  alert('Payment was cancelled.');
+                }
+              );
+            }
+          }, 100);
+        }
+        
         // Track payment event
-        PayoneerService.trackPaymentEvent('payment_method_selected', planKey, method.id);
+        PayPalService.trackPaymentEvent('payment_method_selected', planKey, method.id);
       } else {
         throw new Error('Payment processing failed');
       }
@@ -1591,6 +1202,36 @@ function PlanCard({ title, accent, priceText, bulletPoints, actionLabel, onSelec
                 <div style={{marginTop:12,padding:10,background:'#e8f5e8',borderRadius:6,fontSize:11,border:'1px solid #c3e6cb'}}>
                   <strong style={{color:'#155724'}}>⏱ Activation Time:</strong> 
                   <span style={{marginLeft:8,color:'#155724'}}>{paymentInstructions.activationTime}</span>
+                </div>
+              )}
+
+              {/* PayPal Button Container */}
+              {selectedMethod?.id === 'paypal' && (
+                <div style={{marginTop:16}}>
+                  <div style={{marginBottom:12,padding:12,background:'#fff3cd',borderRadius:8,border:'1px solid #ffeaa7'}}>
+                    <strong style={{color:'#856404'}}>💳 Complete Payment with PayPal:</strong>
+                    <div style={{fontSize:11,color:'#856404',marginTop:4}}>
+                      Click the PayPal button below to complete your subscription
+                    </div>
+                  </div>
+                  <div 
+                    id={`paypal-button-${planKey}`}
+                    style={{
+                      minHeight: '50px',
+                      background: '#f8f9fa',
+                      borderRadius: '8px',
+                      padding: '10px',
+                      border: '2px dashed #dee2e6',
+                      textAlign: 'center',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '14px',
+                      color: '#6c757d'
+                    }}
+                  >
+                    Loading PayPal button...
+                  </div>
                 </div>
               )}
 

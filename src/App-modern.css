@@ -44,6 +44,12 @@ body {
   align-items: center;
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
 .header h1 {
   font-family: var(--font-display);
   font-size: var(--text-3xl);
