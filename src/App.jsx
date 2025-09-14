@@ -739,6 +739,65 @@ function App() {
                       </label>
                     </div>
 
+                    <div className={`form-field ${hasFieldError('clientName') ? 'has-error' : ''}`}>
+                      <label className="field-label required" htmlFor="receiptClientName">Client Name</label>
+                      <input
+                        type="text"
+                        id="receiptClientName"
+                        placeholder="Enter client name"
+                        value={receipt.clientName}
+                        onChange={e => setReceipt({ ...receipt, clientName: e.target.value })}
+                        className="form-input"
+                        data-field="clientName"
+                      />
+                      {hasFieldError('clientName') && (
+                        <div className="error-message">{getFieldError('clientName')}</div>
+                      )}
+                    </div>
+
+                    <div className="form-grid">
+                      <div className={`form-field ${hasFieldError('receiptNumber') ? 'has-error' : ''}`}>
+                        <label className="field-label required" htmlFor="receiptNumber">Receipt Number</label>
+                        <div className="input-with-action">
+                          <input
+                            type="text"
+                            id="receiptNumber"
+                            placeholder="REC-001"
+                            value={receipt.receiptNumber}
+                            onChange={e => setReceipt({ ...receipt, receiptNumber: e.target.value })}
+                            className="form-input"
+                            data-field="receiptNumber"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setReceipt({ ...receipt, receiptNumber: InvoiceService.generateReceiptNumber() })}
+                            className="btn btn-secondary btn-sm"
+                            title="Generate New Number"
+                          >
+                            🔄
+                          </button>
+                        </div>
+                        {hasFieldError('receiptNumber') && (
+                          <div className="error-message">{getFieldError('receiptNumber')}</div>
+                        )}
+                      </div>
+
+                      <div className={`form-field ${hasFieldError('date') ? 'has-error' : ''}`}>
+                        <label className="field-label required" htmlFor="receiptDate">Receipt Date</label>
+                        <input
+                          type="date"
+                          id="receiptDate"
+                          value={receipt.date}
+                          onChange={e => setReceipt({ ...receipt, date: e.target.value })}
+                          className="form-input"
+                          data-field="date"
+                        />
+                        {hasFieldError('date') && (
+                          <div className="error-message">{getFieldError('date')}</div>
+                        )}
+                      </div>
+                    </div>
+
                     <div className={`form-field ${hasFieldError('amount') ? 'has-error' : ''}`}>
                       <label className="field-label required" htmlFor="receiptAmount">Amount</label>
                       <input
@@ -760,7 +819,51 @@ function App() {
                       )}
                     </div>
 
-                    {/* Action buttons - removed problematic submit button */}
+                    <div className="form-grid">
+                      <div className="form-field">
+                        <label className="field-label" htmlFor="receiptTax">Tax (%)</label>
+                        <input
+                          type="number"
+                          id="receiptTax"
+                          min="0"
+                          max="100"
+                          step="0.01"
+                          placeholder="0.00"
+                          value={receipt.tax || ''}
+                          onChange={e => setReceipt({ ...receipt, tax: Number(e.target.value) || 0 })}
+                          className="form-input"
+                        />
+                      </div>
+
+                      <div className="form-field">
+                        <label className="field-label" htmlFor="receiptDiscount">Discount (%)</label>
+                        <input
+                          type="number"
+                          id="receiptDiscount"
+                          min="0"
+                          max="100"
+                          step="0.01"
+                          placeholder="0.00"
+                          value={receipt.discount || ''}
+                          onChange={e => setReceipt({ ...receipt, discount: Number(e.target.value) || 0 })}
+                          className="form-input"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="form-field">
+                      <label className="field-label" htmlFor="receiptNotes">Notes</label>
+                      <textarea
+                        id="receiptNotes"
+                        placeholder="Additional notes or payment method..."
+                        value={receipt.notes}
+                        onChange={e => setReceipt({ ...receipt, notes: e.target.value })}
+                        className="form-input"
+                        rows="3"
+                      />
+                    </div>
+
+                    {/* Action buttons */}
                     <div className="form-actions">
                       <button
                         type="button"
@@ -776,6 +879,27 @@ function App() {
                         className="export-btn"
                       >
                         📤 Export Options
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={generateAndUploadReceipt}
+                        disabled={uploading}
+                        className="btn btn-primary"
+                        style={{
+                          background: 'linear-gradient(45deg, #667eea, #764ba2)',
+                          color: 'white',
+                          border: 'none',
+                          padding: '12px 24px',
+                          borderRadius: '8px',
+                          fontSize: '16px',
+                          fontWeight: '600',
+                          cursor: uploading ? 'not-allowed' : 'pointer',
+                          opacity: uploading ? 0.7 : 1,
+                          transition: 'all 0.3s ease'
+                        }}
+                      >
+                        {uploading ? '⏳ Generating...' : '📄 Generate PDF'}
                       </button>
                     </div>
 
@@ -812,17 +936,47 @@ function App() {
                   </div>
 
                   <div className="preview-section">
-                    <h3>Receipt Preview</h3>
+                    <h3>👁️ Receipt Preview</h3>
                     <div className="preview-box">
-                      <p><strong>{receipt.businessName}</strong></p>
-                      <p>{receipt.businessContact}</p>
+                      <p><strong>{receipt.businessName || 'Business Name'}</strong></p>
+                      <p>{receipt.businessContact || 'Business Contact'}</p>
                       <hr />
-                      <p><strong>Receipt Number:</strong> {receipt.receiptNumber}</p>
-                      <p><strong>Date:</strong> {receipt.date}</p>
-                      <p><strong>Client:</strong> {receipt.clientName}</p>
-                      <p>{receipt.clientDetails}</p>
-                      <p><strong>Amount:</strong> ${(receipt.amount || 0).toFixed(2)}</p>
-                      <p><strong>Notes:</strong> {receipt.notes}</p>
+                      <p><strong>Receipt Number:</strong> {receipt.receiptNumber || 'REC-001'}</p>
+                      <p><strong>Date:</strong> {receipt.date || new Date().toISOString().split('T')[0]}</p>
+                      <p><strong>Client:</strong> {receipt.clientName || 'Client Name'}</p>
+                      <hr />
+                      <div style={{display: 'flex', justifyContent: 'space-between'}}>
+                        <span><strong>Subtotal:</strong></span>
+                        <span>${(receipt.amount || 0).toFixed(2)}</span>
+                      </div>
+                      {(receipt.tax > 0) && (
+                        <div style={{display: 'flex', justifyContent: 'space-between'}}>
+                          <span><strong>Tax ({receipt.tax}%):</strong></span>
+                          <span>${((receipt.amount || 0) * (receipt.tax / 100)).toFixed(2)}</span>
+                        </div>
+                      )}
+                      {(receipt.discount > 0) && (
+                        <div style={{display: 'flex', justifyContent: 'space-between'}}>
+                          <span><strong>Discount ({receipt.discount}%):</strong></span>
+                          <span>-${((receipt.amount || 0) * (receipt.discount / 100)).toFixed(2)}</span>
+                        </div>
+                      )}
+                      <hr />
+                      <div style={{display: 'flex', justifyContent: 'space-between', fontSize: '1.2em', fontWeight: 'bold'}}>
+                        <span><strong>Total:</strong></span>
+                        <span>${(function() {
+                          const amount = receipt.amount || 0;
+                          const tax = (amount * (receipt.tax || 0)) / 100;
+                          const discount = (amount * (receipt.discount || 0)) / 100;
+                          return (amount + tax - discount).toFixed(2);
+                        }())}</span>
+                      </div>
+                      {receipt.notes && (
+                        <>
+                          <hr />
+                          <p><strong>Notes:</strong> {receipt.notes}</p>
+                        </>
+                      )}
                     </div>
                   </div>
                   
