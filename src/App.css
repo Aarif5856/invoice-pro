@@ -133,11 +133,11 @@ body {
   width: 100%;
   margin: 12px 0;
   padding: 14px 16px;
-  border: 1px solid #d0d7de;
+  border: 1px solid var(--color-border, #d0d7de);
   border-radius: 8px;
   font-size: 16px; /* Prevents zoom on iOS */
-  background: #fff;
-  color: #222;
+  background: var(--color-input, #fff);
+  color: var(--color-foreground, #222);
   transition: border 0.2s;
   box-sizing: border-box;
   min-height: 44px; /* Touch-friendly */
@@ -145,7 +145,7 @@ body {
 
 .form-input:focus {
   outline: none;
-  border-color: #4f8cff;
+  border-color: var(--color-primary, #4f8cff);
   box-shadow: 0 0 0 3px rgba(79, 140, 255, 0.1);
 }
 .form-input[type="file"] {
@@ -476,11 +476,11 @@ body {
   width: 100%;
   margin: 12px 0;
   padding: 14px 16px;
-  border: 1px solid #d0d7de;
+  border: 1px solid var(--color-border, #d0d7de);
   border-radius: 8px;
   font-size: 16px; /* Prevents zoom on iOS */
-  background: #fff;
-  color: #222;
+  background: var(--color-input, #fff);
+  color: var(--color-foreground, #222);
   box-sizing: border-box;
   min-height: 44px; /* Touch-friendly */
 }
@@ -690,7 +690,7 @@ body {
 .item-row .form-group label {
   font-size: 14px;
   font-weight: 600;
-  color: #374151;
+  color: var(--color-foreground, #374151);
   margin-bottom: 4px;
 }
 
@@ -783,12 +783,12 @@ body {
   font-weight: 700;
 }
 .auth-form .form-input {
-  background: #fff;
-  color: #0b1220;
-  border: 1px solid #dbe7fb;
+  background: var(--color-input, #fff);
+  color: var(--color-foreground, #0b1220);
+  border: 1px solid var(--color-border, #dbe7fb);
 }
 .form-input::placeholder {
-  color: #9aa4b2;
+  color: var(--color-secondary, #9aa4b2);
   opacity: 1;
 }
 .auth-form .submit-btn {
@@ -886,7 +886,7 @@ body {
 
 .signup-label {
   font-size: 15px;
-  color: #374151;
+  color: var(--color-foreground, #374151);
   margin: 0 0 12px 0;
   font-weight: 600;
 }
@@ -902,14 +902,14 @@ body {
 .option-btn {
   flex: 1;
   padding: 14px 20px;
-  background: white;
+  background: var(--color-card, white);
   border: none;
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
-  border-right: 2px solid #2563eb;
-  color: #374151;
+  border-right: 2px solid var(--color-primary, #2563eb);
+  color: var(--color-foreground, #374151);
 }
 
 .option-btn:last-child {
@@ -917,14 +917,14 @@ body {
 }
 
 .option-btn.active {
-  background: #2563eb;
+  background: var(--color-primary, #2563eb);
   color: white;
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .option-btn:not(.active):hover {
-  background: #f8fafc;
-  color: #2563eb;
+  background: var(--color-muted, #f8fafc);
+  color: var(--color-primary, #2563eb);
 }
 
 .service-options {
@@ -933,7 +933,7 @@ body {
 
 .service-label {
   font-size: 15px;
-  color: #374151;
+  color: var(--color-foreground, #374151);
   margin: 0 0 12px 0;
   font-weight: 600;
 }
@@ -948,27 +948,27 @@ body {
   flex: 1;
   min-width: 120px;
   padding: 12px 16px;
-  background: white;
-  border: 2px solid #2563eb;
+  background: var(--color-card, white);
+  border: 2px solid var(--color-primary, #2563eb);
   border-radius: 8px;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
-  color: #374151;
+  color: var(--color-foreground, #374151);
 }
 
 .service-btn.active {
-  background: #2563eb;
+  background: var(--color-primary, #2563eb);
   color: white;
-  border-color: #2563eb;
+  border-color: var(--color-primary, #2563eb);
   box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
 }
 
 .service-btn:not(.active):hover {
-  background: #f8fafc;
-  border-color: #1d4ed8;
-  color: #2563eb;
+  background: var(--color-muted, #f8fafc);
+  border-color: var(--color-accent, #1d4ed8);
+  color: var(--color-primary, #2563eb);
   transform: translateY(-1px);
 }
 
@@ -1005,7 +1005,7 @@ body {
   display: block;
   font-size: 15px;
   font-weight: 600;
-  color: #374151;
+  color: var(--color-foreground, #374151);
   margin-bottom: 8px;
 }
 
@@ -1016,37 +1016,37 @@ body {
 .form-input {
   width: 100%;
   padding: 14px 16px;
-  border: 2px solid #d1d5db;
+  border: 2px solid var(--color-border, #d1d5db);
   border-radius: 8px;
   font-size: 15px;
   font-weight: 500;
   transition: all 0.2s;
-  background: white;
-  color: #374151;
+  background: var(--color-input, white);
+  color: var(--color-foreground, #374151);
 }
 
 .form-input:focus {
   outline: none;
-  border-color: #2563eb;
+  border-color: var(--color-primary, #2563eb);
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 .form-input::placeholder {
-  color: #9ca3af;
+  color: var(--color-secondary, #9ca3af);
   font-weight: 400;
 }
 
 .form-select {
   width: 100%;
   padding: 14px 16px;
-  border: 2px solid #d1d5db;
+  border: 2px solid var(--color-border, #d1d5db);
   border-radius: 8px;
   font-size: 15px;
   font-weight: 500;
-  background: white;
+  background: var(--color-input, white);
   cursor: pointer;
   transition: all 0.2s;
-  color: #374151;
+  color: var(--color-foreground, #374151);
   appearance: none;
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
   background-position: right 12px center;
@@ -1057,15 +1057,15 @@ body {
 
 .form-select:focus {
   outline: none;
-  border-color: #2563eb;
+  border-color: var(--color-primary, #2563eb);
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 .form-select option {
   padding: 12px;
   font-size: 15px;
-  color: #374151;
-  background: white;
+  color: var(--color-foreground, #374151);
+  background: var(--color-input, white);
 }
 
 .password-input-container {
