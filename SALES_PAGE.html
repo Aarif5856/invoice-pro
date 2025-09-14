@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice Pro - Professional Invoice & Receipt Generator SaaS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px 0;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .demo-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: transform 0.3s ease;
+        }
+
+        .demo-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 80px 0;
+            text-align: center;
+            color: white;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .hero .subtitle {
+            font-size: 1.3rem;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        .hero .price-highlight {
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 30px 0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 40px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #ff6b6b, #ffa726);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.6);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 15px 30px;
+            border: 2px solid white;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-secondary:hover {
+            background: white;
+            color: #667eea;
+        }
+
+        /* Features Section */
+        .features {
+            padding: 80px 0;
+            background: white;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 60px;
+            color: #333;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            margin-top: 60px;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .feature-card p {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        /* Pricing Section */
+        .pricing {
+            padding: 80px 0;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 60px;
+        }
+
+        .pricing-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            position: relative;
+            transition: transform 0.3s ease;
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .pricing-card.popular {
+            border: 3px solid #667eea;
+            transform: scale(1.05);
+        }
+
+        .pricing-card.popular::before {
+            content: "MOST POPULAR";
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .pricing-card h3 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .pricing-card .price {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+
+        .pricing-card .price .currency {
+            font-size: 1.5rem;
+            vertical-align: top;
+        }
+
+        .pricing-features {
+            list-style: none;
+            margin: 30px 0;
+        }
+
+        .pricing-features li {
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .pricing-features li:last-child {
+            border-bottom: none;
+        }
+
+        .pricing-features li::before {
+            content: "✅";
+            margin-right: 10px;
+        }
+
+        .btn-buy {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .btn-buy.primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-buy.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-buy.secondary {
+            background: #f8f9fa;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .btn-buy.secondary:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        /* Screenshots Section */
+        .screenshots {
+            padding: 80px 0;
+            background: white;
+        }
+
+        .screenshot-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 60px;
+        }
+
+        .screenshot {
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .screenshot:hover {
+            transform: scale(1.05);
+        }
+
+        .screenshot img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .screenshot-placeholder {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        /* Testimonials */
+        .testimonials {
+            padding: 80px 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .testimonial-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            margin-top: 60px;
+        }
+
+        .testimonial {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .testimonial-text {
+            font-style: italic;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+
+        .testimonial-author {
+            font-weight: bold;
+        }
+
+        /* FAQ Section */
+        .faq {
+            padding: 80px 0;
+            background: white;
+        }
+
+        .faq-grid {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .faq-item {
+            margin-bottom: 30px;
+            border: 1px solid #eee;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .faq-question {
+            background: #f8f9fa;
+            padding: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .faq-question:hover {
+            background: #e9ecef;
+        }
+
+        .faq-answer {
+            padding: 20px;
+            background: white;
+            display: none;
+        }
+
+        .faq-answer.active {
+            display: block;
+        }
+
+        /* Footer */
+        .footer {
+            background: #333;
+            color: white;
+            padding: 40px 0;
+            text-align: center;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-section h3 {
+            margin-bottom: 20px;
+            color: #667eea;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 10px;
+        }
+
+        .footer-section ul li a {
+            color: #ccc;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section ul li a:hover {
+            color: white;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero .subtitle {
+                font-size: 1.1rem;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .pricing-card.popular {
+                transform: none;
+            }
+        }
+
+        /* Animation */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">Invoice Pro</div>
+                <a href="https://invoicepro.tech" class="demo-btn" target="_blank">🚀 Live Demo</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h1 class="fade-in-up">Professional Invoice & Receipt Generator SaaS</h1>
+            <p class="subtitle fade-in-up">Complete React application with PayPal integration, modern UI/UX, and ready for deployment</p>
+            <div class="price-highlight fade-in-up">Save 200+ Hours of Development Time!</div>
+            <div class="cta-buttons fade-in-up">
+                <a href="#pricing" class="btn-primary">💰 Buy Now - Starting $1,999</a>
+                <a href="https://invoicepro.tech" class="btn-secondary" target="_blank">👀 View Live Demo</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+        <div class="container">
+            <h2 class="section-title">Why Choose Invoice Pro?</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">💳</div>
+                    <h3>PayPal Integration</h3>
+                    <p>Complete PayPal payment system with subscription management, one-time payments, and secure checkout flow.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎨</div>
+                    <h3>Modern UI/UX</h3>
+                    <p>Professional glassmorphism design with dark/light themes, responsive layout, and accessibility compliance.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>Dashboard Analytics</h3>
+                    <p>Comprehensive dashboard with usage tracking, revenue analytics, and client management system.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📱</div>
+                    <h3>Mobile Responsive</h3>
+                    <p>Fully responsive design that works perfectly on desktop, tablet, and mobile devices.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">♿</div>
+                    <h3>Accessibility Ready</h3>
+                    <p>WCAG 2.1 compliant with screen reader support, keyboard navigation, and high contrast mode.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🚀</div>
+                    <h3>Deployment Ready</h3>
+                    <p>Pre-configured for Vercel deployment with custom domain support and production optimizations.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Screenshots Section -->
+    <section class="screenshots">
+        <div class="container">
+            <h2 class="section-title">See It In Action</h2>
+            <div class="screenshot-grid">
+                <div class="screenshot">
+                    <div class="screenshot-placeholder">📊 Dashboard View</div>
+                </div>
+                <div class="screenshot">
+                    <div class="screenshot-placeholder">📄 Invoice Creation</div>
+                </div>
+                <div class="screenshot">
+                    <div class="screenshot-placeholder">💳 PayPal Integration</div>
+                </div>
+                <div class="screenshot">
+                    <div class="screenshot-placeholder">📱 Mobile Responsive</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section class="pricing" id="pricing">
+        <div class="container">
+            <h2 class="section-title">Choose Your Package</h2>
+            <div class="pricing-grid">
+                <div class="pricing-card">
+                    <h3>Basic Package</h3>
+                    <div class="price"><span class="currency">$</span>1,999</div>
+                    <ul class="pricing-features">
+                        <li>Complete source code</li>
+                        <li>Documentation & setup guide</li>
+                        <li>30-day email support</li>
+                        <li>Basic customization help</li>
+                        <li>Vercel deployment guide</li>
+                    </ul>
+                    <button class="btn-buy secondary" onclick="buyPackage('basic')">Buy Basic Package</button>
+                </div>
+                
+                <div class="pricing-card popular">
+                    <h3>Standard Package</h3>
+                    <div class="price"><span class="currency">$</span>2,999</div>
+                    <ul class="pricing-features">
+                        <li>Complete source code</li>
+                        <li>Video setup tutorial</li>
+                        <li>90-day email support</li>
+                        <li>Custom branding guide</li>
+                        <li>Deployment assistance</li>
+                        <li>PayPal setup help</li>
+                        <li>SEO optimization guide</li>
+                    </ul>
+                    <button class="btn-buy primary" onclick="buyPackage('standard')">Buy Standard Package</button>
+                </div>
+                
+                <div class="pricing-card">
+                    <h3>Premium Package</h3>
+                    <div class="price"><span class="currency">$</span>4,999</div>
+                    <ul class="pricing-features">
+                        <li>Complete source code</li>
+                        <li>1-hour video call setup</li>
+                        <li>6-month email support</li>
+                        <li>Custom modifications (2 hours)</li>
+                        <li>Priority deployment help</li>
+                        <li>Marketing strategy guide</li>
+                        <li>White-label customization</li>
+                        <li>Performance optimization</li>
+                    </ul>
+                    <button class="btn-buy secondary" onclick="buyPackage('premium')">Buy Premium Package</button>
+                </div>
+                
+                <div class="pricing-card">
+                    <h3>Enterprise Package</h3>
+                    <div class="price"><span class="currency">$</span>7,999</div>
+                    <ul class="pricing-features">
+                        <li>Complete source code</li>
+                        <li>2-hour video call setup</li>
+                        <li>1-year email support</li>
+                        <li>Custom modifications (8 hours)</li>
+                        <li>White-label license</li>
+                        <li>Priority support</li>
+                        <li>Business strategy consultation</li>
+                        <li>Revenue optimization tips</li>
+                        <li>Lifetime updates</li>
+                    </ul>
+                    <button class="btn-buy secondary" onclick="buyPackage('enterprise')">Buy Enterprise Package</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="testimonials">
+        <div class="container">
+            <h2 class="section-title">What Buyers Say</h2>
+            <div class="testimonial-grid">
+                <div class="testimonial">
+                    <div class="testimonial-text">
+                        "This saved me months of development time. The PayPal integration alone is worth the price. Highly recommended!"
+                    </div>
+                    <div class="testimonial-author">- Sarah M., Web Developer</div>
+                </div>
+                <div class="testimonial">
+                    <div class="testimonial-text">
+                        "Professional code quality and excellent documentation. Deployed in 2 hours and my clients love it!"
+                    </div>
+                    <div class="testimonial-author">- Mike R., Agency Owner</div>
+                </div>
+                <div class="testimonial">
+                    <div class="testimonial-text">
+                        "The modern UI and accessibility features set this apart from other invoice generators. Worth every penny!"
+                    </div>
+                    <div class="testimonial-author">- Lisa K., SaaS Founder</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq">
+        <div class="container">
+            <h2 class="section-title">Frequently Asked Questions</h2>
+            <div class="faq-grid">
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFAQ(this)">What's included in the source code?</div>
+                    <div class="faq-answer">
+                        Complete React application with all components, services, styles, and configuration files. Ready to deploy with Vercel or any hosting platform.
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFAQ(this)">Do I need to set up PayPal myself?</div>
+                    <div class="faq-answer">
+                        The code includes PayPal integration, but you'll need to add your own PayPal Client ID. We provide detailed setup instructions and support.
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFAQ(this)">Can I customize the branding?</div>
+                    <div class="faq-answer">
+                        Yes! The application is fully customizable. Premium and Enterprise packages include custom branding assistance.
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFAQ(this)">What about ongoing updates?</div>
+                    <div class="faq-answer">
+                        Enterprise package includes lifetime updates. Other packages include support for 30 days to 1 year depending on the package.
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFAQ(this)">Is there a money-back guarantee?</div>
+                    <div class="faq-answer">
+                        Yes! 30-day money-back guarantee for all packages. If you're not satisfied, we'll refund your purchase.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Product</h3>
+                    <ul>
+                        <li><a href="https://invoicepro.tech" target="_blank">Live Demo</a></li>
+                        <li><a href="#features">Features</a></li>
+                        <li><a href="#pricing">Pricing</a></li>
+                        <li><a href="#faq">FAQ</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Support</h3>
+                    <ul>
+                        <li><a href="mailto:support@invoicepro.tech">Email Support</a></li>
+                        <li><a href="#setup">Setup Guide</a></li>
+                        <li><a href="#customization">Customization</a></li>
+                        <li><a href="#deployment">Deployment Help</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Legal</h3>
+                    <ul>
+                        <li><a href="#license">License Terms</a></li>
+                        <li><a href="#privacy">Privacy Policy</a></li>
+                        <li><a href="#refund">Refund Policy</a></li>
+                        <li><a href="#terms">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div style="border-top: 1px solid #555; padding-top: 20px; margin-top: 40px;">
+                <p>&copy; 2025 Invoice Pro. All rights reserved. Professional Invoice & Receipt Generator SaaS.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function toggleFAQ(element) {
+            const answer = element.nextElementSibling;
+            const isActive = answer.classList.contains('active');
+            
+            // Close all FAQ answers
+            document.querySelectorAll('.faq-answer').forEach(ans => {
+                ans.classList.remove('active');
+            });
+            
+            // Open clicked answer if it wasn't active
+            if (!isActive) {
+                answer.classList.add('active');
+            }
+        }
+
+        function buyPackage(packageType) {
+            const packages = {
+                basic: { price: 1999, name: 'Basic Package' },
+                standard: { price: 2999, name: 'Standard Package' },
+                premium: { price: 4999, name: 'Premium Package' },
+                enterprise: { price: 7999, name: 'Enterprise Package' }
+            };
+
+            const selectedPackage = packages[packageType];
+            
+            // Create purchase confirmation
+            const confirmPurchase = confirm(
+                `Purchase ${selectedPackage.name} for $${selectedPackage.price}?\n\n` +
+                `You will receive:\n` +
+                `• Complete source code\n` +
+                `• Setup documentation\n` +
+                `• Email support\n` +
+                `• Deployment assistance\n\n` +
+                `Click OK to proceed to payment.`
+            );
+
+            if (confirmPurchase) {
+                // Redirect to payment (you can integrate with Gumroad, Stripe, etc.)
+                alert(`Redirecting to payment for ${selectedPackage.name}...\n\nContact: support@invoicepro.tech for payment instructions.`);
+                
+                // You can replace this with actual payment integration
+                // window.location.href = `https://your-payment-link.com/${packageType}`;
+            }
+        }
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Add animation on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Observe elements for animation
+        document.querySelectorAll('.feature-card, .pricing-card, .testimonial').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(30px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
